@@ -296,6 +296,32 @@ function updateBadges(){
 }
 function kpi(label,value,sub,cls){return `<div class="card"><div class="kpi-label">${label}</div><div class="kpi-value ${cls||''}">${value}</div><div class="kpi-sub ${cls||''}">${sub||''}</div></div>`}
 
+/* ---------- EXPORT CSV ---------- */
+function exportCSV(filename, rows){
+  const csv = rows.map(r=>r.map(c=>`"${String(c??'').replace(/"/g,'""')}"`).join(';')).join('\n');
+  const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  toast('CSV baixado ✔');
+}
+function exportFin(){
+  const rows=[['Data','Vencimento','Tipo','Descrição','Categoria','Forma','Status','Valor (R$)']];
+  [...co.data.fin].sort((a,b)=>b.date.localeCompare(a.date)).forEach(f=>rows.push([brDate(f.date),brDate(f.due||f.date),f.type==='in'?'Entrada':'Saída',f.desc,f.cat||'',f.method||'',effectiveStatus(f),f.value.toFixed(2).replace('.',',')]));
+  exportCSV('gestorpro-financeiro.csv',rows);
+}
+function exportStock(){
+  const rows=[['Produto','Categoria','Unidade','Quantidade','Mínimo','Custo médio (R$)','Valor total (R$)','Fornecedor']];
+  co.data.stock.forEach(p=>rows.push([p.name,p.cat||'',p.unit,p.qty,p.min,p.cost.toFixed(2).replace('.',','),(p.qty*p.cost).toFixed(2).replace('.',','),supplierName(p.supplierId)]));
+  exportCSV('gestorpro-estoque.csv',rows);
+}
+function exportPurch(){
+  const rows=[['Data','Fornecedor','Itens','Total (R$)','Forma','Status financeiro']];
+  [...co.data.purch].sort((a,b)=>b.date.localeCompare(a.date)).forEach(p=>rows.push([brDate(p.date),supplierName(p.supplierId),p.items.map(it=>{const pr=co.data.stock.find(x=>x.id===it.stockId);return (pr?pr.name:'—')+' x'+it.qty}).join(', '),p.total.toFixed(2).replace('.',','),p.method||'',p.finStatus]));
+  exportCSV('gestorpro-compras.csv',rows);
+}
+
 /* ---------- DASHBOARD ---------- */
 function viewDash(){
   const fin=co.data.fin;
@@ -365,12 +391,13 @@ function viewFin(){
   </div>
   <div class="card mt">
     <div class="card-title"><h3>Histórico</h3>
-      <div style="display:flex;gap:8px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
         <input id="finSearch" placeholder="Buscar..." style="width:200px" oninput="renderFinTable()">
         <select id="finFilter" onchange="renderFinTable()">
           <option value="all">Todos</option><option value="in">Entradas</option><option value="out">Despesas</option>
           <option value="pago">Pagos</option><option value="pendente">Pendentes</option><option value="vencido">Vencidos</option>
         </select>
+        <button class="btn btn-sm" onclick="exportFin()">⬇ CSV</button>
       </div>
     </div>
     <div id="finTable">${finTable(list)}</div>
@@ -443,7 +470,7 @@ function viewStock(){
     ${kpi('Movimentações',co.data.moves.length,'entradas, saídas, perdas e ajustes')}
   </div>
   <div class="card mt">
-    <div class="card-title"><h3>Produtos em estoque</h3><button class="btn btn-primary btn-sm" onclick="openStockModal()">+ Produto</button></div>
+    <div class="card-title"><h3>Produtos em estoque</h3><div style="display:flex;gap:8px"><button class="btn btn-sm" onclick="exportStock()">⬇ CSV</button><button class="btn btn-primary btn-sm" onclick="openStockModal()">+ Produto</button></div></div>
     <div class="tbl-wrap"><table>
     <tr><th>Produto</th><th>Categoria</th><th>Unid.</th><th class="num">Atual</th><th class="num">Mín.</th><th class="num">Custo médio</th><th class="num">Total</th><th>Fornecedor</th><th></th></tr>
     ${list.length?list.map(p=>`<tr>
@@ -521,7 +548,7 @@ function viewPurch(){
     ${kpi('Ticket médio',list.length?money(spend/list.length):money(0),'')}
   </div>
   <div class="card mt">
-    <div class="card-title"><h3>Histórico de compras</h3><button class="btn btn-primary btn-sm" onclick="openPurchModal()">+ Nova compra</button></div>
+    <div class="card-title"><h3>Histórico de compras</h3><div style="display:flex;gap:8px"><button class="btn btn-sm" onclick="exportPurch()">⬇ CSV</button><button class="btn btn-primary btn-sm" onclick="openPurchModal()">+ Nova compra</button></div></div>
     <div class="tbl-wrap"><table>
     <tr><th>Data</th><th>Fornecedor</th><th>Itens</th><th class="num">Total</th><th>Status fin.</th><th></th></tr>
     ${list.length?list.map(p=>`<tr>
