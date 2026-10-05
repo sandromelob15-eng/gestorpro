@@ -6,9 +6,9 @@
 <title>GestorPro — Gestão para alimentação</title>
 <style>
 :root{
-  --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --line:#2a2f3a;
-  --txt:#e8eaf0; --mut:#9aa1af; --orange:#ff7a1a; --orange2:#ff9a4d;
-  --green:#22c55e; --red:#ef4444; --amber:#f59e0b; --cyan:#22d3ee;
+  --bg:#faf5ee; --panel:#ffffff; --panel2:#f4ecdf; --line:#e7dcc9;
+  --txt:#3d2c1e; --mut:#8a7660; --orange:#e8590c; --orange2:#c2410c;
+  --green:#16a34a; --red:#dc2626; --amber:#d97706; --cyan:#0891b2;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--txt);font-size:14px}
@@ -24,15 +24,15 @@ h3{font-size:15px}
 .mb{margin-bottom:14px}
 .pos{color:var(--green)}.neg{color:var(--red)}.warn{color:var(--amber)}
 
-#login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(1200px 600px at 70% 20%,rgba(255,122,26,.12),transparent),var(--bg);z-index:50}
+#login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(1200px 600px at 70% 20%,rgba(232,89,12,.10),transparent),var(--bg);z-index:50}
 .login-card{width:380px;max-width:92vw;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:32px 28px}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px}
-.logo-badge{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--orange),#e8620a);display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-badge{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--orange),#ca4a0a);display:flex;align-items:center;justify-content:center;font-size:18px}
 .login-card h1{font-size:19px;margin:18px 0 2px}
 .login-card .sub{color:var(--mut);font-size:13px;margin-bottom:18px}
 .login-card label{margin-top:12px}
 .btn{border:none;border-radius:9px;padding:10px 16px;font-weight:700;font-size:14px;background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
-.btn-primary{background:linear-gradient(135deg,var(--orange),#e8620a);border:none;color:#fff}
+.btn-primary{background:linear-gradient(135deg,var(--orange),#ca4a0a);border:none;color:#fff}
 .btn:hover{filter:brightness(1.12)}
 .btn-sm{padding:6px 10px;font-size:12.5px;border-radius:7px}
 .btn-block{width:100%;margin-top:16px}
@@ -44,7 +44,7 @@ h3{font-size:15px}
 .side-nav{flex:1;padding:10px 8px;overflow-y:auto}
 .nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:9px;color:var(--mut);font-weight:600;cursor:pointer;margin-bottom:2px}
 .nav-item:hover{background:var(--panel2);color:var(--txt)}
-.nav-item.active{background:linear-gradient(135deg,rgba(255,122,26,.18),rgba(255,122,26,.08));color:var(--orange2);border:1px solid rgba(255,122,26,.25)}
+.nav-item.active{background:linear-gradient(135deg,rgba(232,89,12,.14),rgba(232,89,12,.06));color:var(--orange2);border:1px solid rgba(232,89,12,.30)}
 .nav-item .ic{width:20px;text-align:center}
 .nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10.5px;font-weight:700;border-radius:99px;padding:1px 7px}
 .side-foot{padding:14px 16px;border-top:1px solid var(--line);font-size:12.5px}
@@ -69,17 +69,17 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}
 th{text-align:left;color:var(--mut);font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;padding:8px 10px;border-bottom:1px solid var(--line)}
 td{padding:9px 10px;border-bottom:1px solid var(--line)}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,255,255,.02)}
+tr:hover td{background:rgba(61,44,30,.03)}
 td.num,th.num{text-align:right}
 .tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:700}
-.tag-paid{background:rgba(34,197,94,.15);color:var(--green)}
-.tag-pend{background:rgba(245,158,11,.15);color:var(--amber)}
-.tag-over{background:rgba(239,68,68,.15);color:var(--red)}
-.tag-info{background:rgba(34,211,238,.12);color:var(--cyan)}
+.tag-paid{background:rgba(22,163,74,.12);color:var(--green)}
+.tag-pend{background:rgba(217,119,6,.12);color:var(--amber)}
+.tag-over{background:rgba(220,38,38,.12);color:var(--red)}
+.tag-info{background:rgba(8,145,178,.10);color:var(--cyan)}
 .icon-btn{background:none;border:none;color:var(--mut);font-size:14px;padding:3px 5px}
 .icon-btn:hover{color:var(--txt)}
 
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;z-index:40;padding:16px}
+.overlay{position:fixed;inset:0;background:rgba(61,44,30,.45);display:flex;align-items:center;justify-content:center;z-index:40;padding:16px}
 .modal{background:var(--panel);border:1px solid var(--line);border-radius:14px;width:560px;max-width:96vw;max-height:92vh;overflow-y:auto;padding:22px}
 .modal h3{margin-bottom:14px;font-size:17px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -91,17 +91,17 @@ td.num,th.num{text-align:right}
 .chart .bars{display:flex;gap:3px;align-items:flex-end;height:140px;width:100%;justify-content:center}
 .chart .b{width:16px;border-radius:4px 4px 0 0;min-height:2px}
 .chart .b.in{background:linear-gradient(180deg,var(--green),#15803d)}
-.chart .b.out{background:linear-gradient(180deg,var(--red),#991b1b)}
+.chart .b.out{background:linear-gradient(180deg,var(--red),#b91c1c)}
 .chart .lb{font-size:10.5px;color:var(--mut);white-space:nowrap}
 .legend{display:flex;gap:16px;font-size:12px;color:var(--mut);margin-bottom:8px}
 .dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px}
 .empty{padding:26px;text-align:center;color:var(--mut);font-size:13px}
 
-#toast{position:fixed;bottom:22px;right:22px;background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--green);padding:12px 18px;border-radius:10px;font-size:13.5px;z-index:60;display:none;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--green);padding:12px 18px;border-radius:10px;font-size:13.5px;z-index:60;display:none;box-shadow:0 8px 30px rgba(61,44,30,.25)}
 
 @media(max-width:900px){
   .sidebar{transform:translateX(-100%);transition:.25s}
-  .sidebar.open{transform:none;box-shadow:0 0 60px rgba(0,0,0,.6)}
+  .sidebar.open{transform:none;box-shadow:0 0 60px rgba(61,44,30,.3)}
   .main{margin-left:0}
   .hamburger{display:block}
   .content{padding:16px 14px}
