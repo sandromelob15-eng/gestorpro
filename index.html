@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GestorPro — Gestão para alimentação</title>
+<style>
+:root{
+  --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --line:#2a2f3a;
+  --txt:#e8eaf0; --mut:#9aa1af; --orange:#ff7a1a; --orange2:#ff9a4d;
+  --green:#22c55e; --red:#ef4444; --amber:#f59e0b; --cyan:#22d3ee;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--txt);font-size:14px}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:14px;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:9px 11px;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--orange)}
+label{display:block;font-size:12px;color:var(--mut);margin-bottom:4px;font-weight:600}
+h2{font-size:20px;font-weight:700}
+h3{font-size:15px}
+.muted{color:var(--mut)}
+.small{font-size:12px}
+.mt{margin-top:12px}
+.mb{margin-bottom:14px}
+.pos{color:var(--green)}.neg{color:var(--red)}.warn{color:var(--amber)}
+
+#login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(1200px 600px at 70% 20%,rgba(255,122,26,.12),transparent),var(--bg);z-index:50}
+.login-card{width:380px;max-width:92vw;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:32px 28px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px}
+.logo-badge{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--orange),#e8620a);display:flex;align-items:center;justify-content:center;font-size:18px}
+.login-card h1{font-size:19px;margin:18px 0 2px}
+.login-card .sub{color:var(--mut);font-size:13px;margin-bottom:18px}
+.login-card label{margin-top:12px}
+.btn{border:none;border-radius:9px;padding:10px 16px;font-weight:700;font-size:14px;background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
+.btn-primary{background:linear-gradient(135deg,var(--orange),#e8620a);border:none;color:#fff}
+.btn:hover{filter:brightness(1.12)}
+.btn-sm{padding:6px 10px;font-size:12.5px;border-radius:7px}
+.btn-block{width:100%;margin-top:16px}
+.err{color:#fca5a5;font-size:13px;margin-top:10px;min-height:16px}
+
+#app{display:none;height:100vh}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:232px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;z-index:20}
+.side-head{display:flex;align-items:center;gap:10px;padding:18px 16px;border-bottom:1px solid var(--line)}
+.side-nav{flex:1;padding:10px 8px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:9px;color:var(--mut);font-weight:600;cursor:pointer;margin-bottom:2px}
+.nav-item:hover{background:var(--panel2);color:var(--txt)}
+.nav-item.active{background:linear-gradient(135deg,rgba(255,122,26,.18),rgba(255,122,26,.08));color:var(--orange2);border:1px solid rgba(255,122,26,.25)}
+.nav-item .ic{width:20px;text-align:center}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10.5px;font-weight:700;border-radius:99px;padding:1px 7px}
+.side-foot{padding:14px 16px;border-top:1px solid var(--line);font-size:12.5px}
+.main{margin-left:232px;height:100vh;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;gap:12px;padding:14px 24px;border-bottom:1px solid var(--line);background:var(--panel)}
+.topbar h2{font-size:17px}
+.topbar .spacer{flex:1}
+.content{flex:1;overflow-y:auto;padding:22px 24px}
+.hamburger{display:none;background:none;border:none;color:var(--txt);font-size:22px}
+
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.kpi-label{font-size:12px;color:var(--mut);font-weight:600;margin-bottom:6px}
+.kpi-value{font-size:22px;font-weight:800}
+.kpi-sub{font-size:12px;margin-top:4px}
+.card-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
+
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;color:var(--mut);font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:9px 10px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+td.num,th.num{text-align:right}
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:700}
+.tag-paid{background:rgba(34,197,94,.15);color:var(--green)}
+.tag-pend{background:rgba(245,158,11,.15);color:var(--amber)}
+.tag-over{background:rgba(239,68,68,.15);color:var(--red)}
+.tag-info{background:rgba(34,211,238,.12);color:var(--cyan)}
+.icon-btn{background:none;border:none;color:var(--mut);font-size:14px;padding:3px 5px}
+.icon-btn:hover{color:var(--txt)}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;z-index:40;padding:16px}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:14px;width:560px;max-width:96vw;max-height:92vh;overflow-y:auto;padding:22px}
+.modal h3{margin-bottom:14px;font-size:17px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+
+.chart{display:flex;align-items:flex-end;gap:10px;height:180px;padding-top:10px}
+.chart .bar-g{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.chart .bars{display:flex;gap:3px;align-items:flex-end;height:140px;width:100%;justify-content:center}
+.chart .b{width:16px;border-radius:4px 4px 0 0;min-height:2px}
+.chart .b.in{background:linear-gradient(180deg,var(--green),#15803d)}
+.chart .b.out{background:linear-gradient(180deg,var(--red),#991b1b)}
+.chart .lb{font-size:10.5px;color:var(--mut);white-space:nowrap}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--mut);margin-bottom:8px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px}
+.empty{padding:26px;text-align:center;color:var(--mut);font-size:13px}
+
+#toast{position:fixed;bottom:22px;right:22px;background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--green);padding:12px 18px;border-radius:10px;font-size:13.5px;z-index:60;display:none;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%);transition:.25s}
+  .sidebar.open{transform:none;box-shadow:0 0 60px rgba(0,0,0,.6)}
+  .main{margin-left:0}
+  .hamburger{display:block}
+  .content{padding:16px 14px}
+  .row2,.row3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="login">
+  <div class="login-card">
+    <div class="logo"><span class="logo-badge">📊</span> GestorPro</div>
+    <h1 id="loginTitle">Entrar na sua empresa</h1>
+    <p class="sub" id="loginSub">Selecione a empresa e digite a senha.</p>
+    <label>Empresa</label>
+    <select id="loginCompany"></select>
+    <div id="companyFields" style="display:none">
+      <label>Nome da empresa</label>
+      <input id="newCompanyName" placeholder="Ex.: Tami Burguer">
+    </div>
+    <label>Senha</label>
+    <input id="loginPass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <div id="loginHint" class="small muted mt" style="display:none">Primeiro acesso: defina uma senha e ela fica vinculada a esta empresa neste navegador.</div>
+    <div class="err" id="loginErr"></div>
+    <button class="btn btn-primary btn-block" onclick="doLogin()">Entrar</button>
+    <p class="small muted mt" id="toggleMode" style="text-align:center;cursor:pointer"></p>
+    <p class="small muted mt" style="text-align:center;opacity:.75">Multiempresa: os dados de cada conta ficam separados neste navegador. Estrutura pronta para Supabase.</p>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app">
+  <div class="sidebar" id="sidebar">
+    <div class="side-head">
+      <div class="logo"><span class="logo-badge">📊</span> <span id="coName">GestorPro</span></div>
+    </div>
+    <nav class="side-nav" id="nav">
+      <div class="nav-item active" data-mod="dash" onclick="go('dash')"><span class="ic">📈</span> Dashboard</div>
+      <div class="nav-item" data-mod="fin" onclick="go('fin')"><span class="ic">💰</span> Financeiro <span class="nav-badge" id="finBadge" style="display:none">0</span></div>
+      <div class="nav-item" data-mod="stock" onclick="go('stock')"><span class="ic">📦</span> Estoque <span class="nav-badge" id="stockBadge" style="display:none">0</span></div>
+      <div class="nav-item" data-mod="purch" onclick="go('purch')"><span class="ic">🛒</span> Compras</div>
+      <div class="nav-item" data-mod="supp" onclick="go('supp')"><span class="ic">🚚</span> Fornecedores</div>
+      <div class="nav-item" data-mod="prods" onclick="go('prods')"><span class="ic">🍽️</span> Produtos e Pratos</div>
+      <div class="nav-item" data-mod="settings" onclick="go('settings')"><span class="ic">⚙️</span> Configurações</div>
+    </nav>
+    <div class="side-foot">
+      <div id="userBox" class="small"></div>
+      <button class="btn btn-sm" style="margin-top:8px;width:100%" onclick="logout()">Sair da conta</button>
+      <p class="small muted" style="margin-top:8px;opacity:.7">MVP v1 — preparado para SaaS</p>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+      <h2 id="pageTitle">Dashboard</h2>
+      <div class="spacer"></div>
+      <button class="btn btn-primary btn-sm" id="ctxBtn" onclick="ctxAction()">+ Lançamento</button>
+    </div>
+    <div id="view" class="content"></div>
+  </div>
+</div>
+
+<div id="modalRoot"></div>
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   GestorPro MVP — arquivo único
+   Dados por empresa (multiempresa) em localStorage.
+   Camada DB isolada: pronta para trocar por Supabase depois.
+   ============================================================ */
+
+const MODULES = {
+  dash:   {title:'Dashboard',        ctx:'+ Lançamento'},
+  fin:    {title:'Financeiro',       ctx:'+ Lançamento'},
+  stock:  {title:'Estoque',          ctx:'+ Produto'},
+  purch:  {title:'Compras',          ctx:'+ Nova compra'},
+  supp:   {title:'Fornecedores',     ctx:'+ Fornecedor'},
+  prods:  {title:'Produtos e Pratos',ctx:'+ Produto/Prato'},
+  settings:{title:'Configurações',   ctx:''}
+};
+
+/* ---------- DB LAYER (trocar por Supabase) ---------- */
+const DB = {
+  read(){ try{return JSON.parse(localStorage.getItem('gestorpro_db'))||{companies:{},session:null}}catch(e){return {companies:{},session:null}} },
+  write(d){ localStorage.setItem('gestorpro_db', JSON.stringify(d)) },
+};
+
+let db = DB.read();
+let co = null;   // empresa logada — dados isolados por conta
+let mod = 'dash';
+let loginMode = false;
+
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const todayISO=()=>new Date().toISOString().slice(0,10);
+const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+const brDate=iso=>iso?iso.split('-').reverse().join('/'):'—';
+function toast(msg){const t=$('toast');t.textContent=msg;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2600)}
+/* status efetivo: pago > vencido (venceu e não pago) > pendente */
+function effectiveStatus(f){ if(f.status==='pago')return 'pago'; const due=f.due||f.date; return (due && due<todayISO()) ? 'vencido' : 'pendente'; }
+function save(){ db.companies[co.id]=co; DB.write(db); }
+function activeFin(){ return co.data.fin.filter(f=>effectiveStatus(f)!=='pago'); }
+function lowStockList(){ return co.data.stock.filter(p=>p.qty<=p.min); }
+function supplierName(id){const s=co.data.supp.find(x=>x.id===id);return s?s.name:'—'}
+
+/* ---------- LOGIN ---------- */
+function renderLogin(){
+  const sel=$('loginCompany'); const names=Object.values(db.companies);
+  if(names.length===0){ setMode(true); $('loginCompany').style.display='none'; $('loginCompany').previousElementSibling.style.display='none'; }
+  else{ setMode(false); sel.style.display=''; sel.previousElementSibling.style.display='';
+    sel.innerHTML=names.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join(''); }
+}
+function setMode(create){
+  loginMode=create;
+  $('companyFields').style.display=create?'block':'none';
+  $('loginTitle').textContent=create?'Criar empresa':'Entrar na sua empresa';
+  $('loginSub').textContent=create?'Cada empresa tem acesso próprio e vê só seus dados.':'Selecione a empresa e digite a senha.';
+  $('loginHint').style.display=create?'block':'none';
+  $('toggleMode').textContent=create?'Já tem empresa? Entrar':'Primeiro acesso? Criar empresa';
+}
+function doLogin(){
+  const err=$('loginErr'); err.textContent='';
+  if(loginMode){
+    const name=$('newCompanyName').value.trim();
+    const pass=$('loginPass').value;
+    if(!name){err.textContent='Informe o nome da empresa.';return}
+    if(pass.length<4){err.textContent='Senha: mínimo 4 caracteres.';return}
+    const id='co_'+uid();
+    db.companies[id]={id,name,pass,
+      settings:{name,phone:'',email:'',addr:'',doc:''},
+      data:{fin:[],stock:[],moves:[],purch:[],supp:[],prods:[]},
+      created:todayISO()};
+    db.session={companyId:id}; DB.write(db);
+    enter(id);
+  } else {
+    const id=$('loginCompany').value; const c=db.companies[id];
+    if(!c){err.textContent='Selecione a empresa.';return}
+    if($('loginPass').value!==c.pass){err.textContent='Senha incorreta.';return}
+    db.session={companyId:id};DB.write(db);enter(id);
+  }
+}
+function enter(id){
+  co=db.companies[id];
+  $('login').style.display='none';$('app').style.display='block';
+  $('userBox').innerHTML=`<b>${esc(co.name)}</b><br><span class="muted">Administrador</span>`;
+  go('dash');
+}
+function logout(){ db.session=null;DB.write(db); $('app').style.display='none';$('login').style.display='flex';renderLogin();$('loginPass').value=''; }
+
+/* ---------- NAV ---------- */
+function go(m){
+  mod=m;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.mod===m));
+  $('pageTitle').textContent=MODULES[m].title;
+  $('ctxBtn').style.display=MODULES[m].ctx?'':'none';
+  $('ctxBtn').textContent=MODULES[m].ctx;
+  $('sidebar').classList.remove('open');
+  render();
+}
+function ctxAction(){
+  if(mod==='stock')openStockModal();
+  else if(mod==='purch')openPurchModal();
+  else if(mod==='supp')openSuppModal();
+  else if(mod==='prods')openProdModal();
+  else openFinModal();
+}
+
+/* ---------- RENDER ---------- */
+function render(){
+  if(!co)return;
+  updateBadges();
+  const v=$('view');
+  if(mod==='dash')v.innerHTML=viewDash();
+  else if(mod==='fin')v.innerHTML=viewFin();
+  else if(mod==='stock')v.innerHTML=viewStock();
+  else if(mod==='purch')v.innerHTML=viewPurch();
+  else if(mod==='supp')v.innerHTML=viewSupp();
+  else if(mod==='prods')v.innerHTML=viewProds();
+  else if(mod==='settings')v.innerHTML=viewSettings();
+  v.scrollTop=0;
+}
+function updateBadges(){
+  const n=lowStockList().length;
+  const b=$('stockBadge');b.style.display=n?'':'none';b.textContent=n;
+  const c=activeFin().filter(f=>effectiveStatus(f)==='vencido').length;
+  const b2=$('finBadge');b2.style.display=c?'':'none';b2.textContent=c;
+  $('coName').textContent=co.name;
+}
+function kpi(label,value,sub,cls){return `<div class="card"><div class="kpi-label">${label}</div><div class="kpi-value ${cls||''}">${value}</div><div class="kpi-sub ${cls||''}">${sub||''}</div></div>`}
+
+/* ---------- DASHBOARD ---------- */
+function viewDash(){
+  const fin=co.data.fin;
+  const cur=todayISO().slice(0,7);
+  const inM=fin.filter(f=>f.type==='in'&&f.date.slice(0,7)===cur).reduce((s,f)=>s+f.value,0);
+  const outM=fin.filter(f=>f.type==='out'&&f.date.slice(0,7)===cur).reduce((s,f)=>s+f.value,0);
+  const result=inM-outM;
+  const pend=fin.filter(f=>effectiveStatus(f)!=='pago');
+  const pendTotal=pend.reduce((s,f)=>s+f.value,0);
+  const low=lowStockList();
+  const lastPurch=[...co.data.purch].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+  const now=new Date(); const months=[];
+  for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({key:d.toISOString().slice(0,7),label:d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')})}
+  const inS=months.map(m=>fin.filter(f=>f.type==='in'&&f.date.slice(0,7)===m.key).reduce((s,f)=>s+f.value,0));
+  const outS=months.map(m=>fin.filter(f=>f.type==='out'&&f.date.slice(0,7)===m.key).reduce((s,f)=>s+f.value,0));
+  const max=Math.max(...inS,...outS,1);
+  const bars=months.map((m,i)=>`<div class="bar-g"><div class="bars"><div class="b in" style="height:${Math.max(2,inS[i]/max*130)}px" title="Receitas: ${money(inS[i])}"></div><div class="b out" style="height:${Math.max(2,outS[i]/max*130)}px" title="Despesas: ${money(outS[i])}"></div></div><div class="lb">${m.label}</div></div>`).join('');
+  return `
+  <div class="grid g4">
+    ${kpi('Faturamento (mês)',money(inM),'entradas registradas','pos')}
+    ${kpi('Despesas (mês)',money(outM),'saídas registradas','neg')}
+    ${kpi('Resultado estimado',money(result),result>=0?'positivo no mês':'negativo no mês',result>=0?'pos':'neg')}
+    ${kpi('Contas pendentes',money(pendTotal),pend.length+' lançamento(s)','warn')}
+  </div>
+  <div class="grid g2 mt">
+    <div class="card">
+      <div class="card-title"><h3>Receitas x Despesas — 6 meses</h3><span class="tag tag-info">em R$</span></div>
+      <div class="legend"><span><span class="dot" style="background:var(--green)"></span>Receitas</span><span><span class="dot" style="background:var(--red)"></span>Despesas</span></div>
+      <div class="chart">${bars}</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><h3>Estoque baixo</h3><span class="tag ${low.length?'tag-over':'tag-paid'}">${low.length} alerta(s)</span></div>
+      <div class="tbl-wrap"><table><tr><th>Produto</th><th class="num">Atual</th><th class="num">Mín.</th></tr>
+      ${low.length?low.map(p=>`<tr><td>${esc(p.name)}</td><td class="num">${p.qty} ${p.unit}</td><td class="num">${p.min} ${p.unit}</td></tr>`).join(''):'<tr><td colspan=3 class="empty">Nenhum produto no mínimo 🎉</td></tr>'}
+      </table></div>
+    </div>
+  </div>
+  <div class="grid g2 mt">
+    <div class="card">
+      <div class="card-title"><h3>Compras recentes</h3><button class="btn btn-sm" onclick="go('purch')">Ver compras</button></div>
+      <div class="tbl-wrap"><table><tr><th>Data</th><th>Fornecedor</th><th class="num">Total</th></tr>
+      ${lastPurch.length?lastPurch.map(p=>`<tr><td>${brDate(p.date)}</td><td>${esc(supplierName(p.supplierId))}</td><td class="num">${money(p.total)}</td></tr>`).join(''):'<tr><td colspan=3 class="empty">Sem compras</td></tr>'}
+      </table></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><h3>Contas pendentes</h3><button class="btn btn-sm" onclick="go('fin')">Ver financeiro</button></div>
+      <div class="tbl-wrap"><table><tr><th>Vencimento</th><th>Descrição</th><th class="num">Valor</th></tr>
+      ${pend.length?pend.slice(0,6).map(f=>`<tr><td>${brDate(f.due||f.date)}</td><td>${esc(f.desc)}</td><td class="num ${effectiveStatus(f)==='vencido'?'neg':''}">${money(f.value)}</td></tr>`).join(''):'<tr><td colspan=3 class="empty">Nada pendente</td></tr>'}
+      </table></div>
+    </div>
+  </div>`;
+}
+
+/* ---------- FINANCEIRO ---------- */
+function viewFin(){
+  const list=[...co.data.fin].sort((a,b)=>b.date.localeCompare(a.date));
+  const inT=list.filter(f=>f.type==='in').reduce((s,f)=>s+f.value,0);
+  const outT=list.filter(f=>f.type==='out').reduce((s,f)=>s+f.value,0);
+  const saldo=inT-outT;
+  const pend=activeFin();
+  return `
+  <div class="grid g4">
+    ${kpi('Entradas (total)',money(inT),'','pos')}
+    ${kpi('Saídas (total)',money(outT),'','neg')}
+    ${kpi('Saldo',money(saldo),saldo>=0?'positivo':'negativo',saldo>=0?'pos':'neg')}
+    ${kpi('Pendentes',money(pend.reduce((s,f)=>s+f.value,0)),pend.filter(f=>effectiveStatus(f)==='vencido').length+' vencida(s)','warn')}
+  </div>
+  <div class="card mt">
+    <div class="card-title"><h3>Histórico</h3>
+      <div style="display:flex;gap:8px">
+        <input id="finSearch" placeholder="Buscar..." style="width:200px" oninput="renderFinTable()">
+        <select id="finFilter" onchange="renderFinTable()">
+          <option value="all">Todos</option><option value="in">Entradas</option><option value="out">Despesas</option>
+          <option value="pago">Pagos</option><option value="pendente">Pendentes</option><option value="vencido">Vencidos</option>
+        </select>
+      </div>
+    </div>
+    <div id="finTable">${finTable(list)}</div>
+  </div>`;
+}
+function finTable(list){
+  if(!list.length)return '<div class="empty">Nenhum lançamento. Use “+ Lançamento”.</div>';
+  return `<div class="tbl-wrap"><table>
+  <tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Venc.</th><th>Forma</th><th>Status</th><th class="num">Valor</th><th></th></tr>
+  ${list.map(f=>{const st=effectiveStatus(f);return `<tr>
+    <td>${brDate(f.date)}</td><td>${esc(f.desc)}</td><td>${esc(f.cat||'—')}</td><td>${brDate(f.due||f.date)}</td><td>${esc(f.method||'—')}</td>
+    <td><span class="tag ${st==='pago'?'tag-paid':st==='vencido'?'tag-over':'tag-pend'}">${st}</span></td>
+    <td class="num ${f.type==='in'?'pos':'neg'}">${f.type==='in'?'+ ':''}${money(f.value)}</td>
+    <td class="num" style="white-space:nowrap">
+      ${st!=='pago'?`<button class="icon-btn" title="Marcar pago" onclick="payFin('${f.id}')">✔</button>`:''}
+      <button class="icon-btn" title="Excluir" onclick="delFin('${f.id}')">🗑</button>
+    </td></tr>`}).join('')}
+  </table></div>`;
+}
+function renderFinTable(){
+  const q=($('finSearch')?.value||'').toLowerCase();
+  const f=$('finFilter')?.value||'all';
+  let list=[...co.data.fin].sort((a,b)=>b.date.localeCompare(a.date));
+  if(f==='in')list=list.filter(x=>x.type==='in');
+  else if(f==='out')list=list.filter(x=>x.type==='out');
+  else if(f!=='all')list=list.filter(x=>effectiveStatus(x)===f);
+  if(q)list=list.filter(x=>(x.desc+' '+(x.cat||'')).toLowerCase().includes(q));
+  $('finTable').innerHTML=finTable(list);
+}
+function payFin(id){const f=co.data.fin.find(x=>x.id===id);if(f){f.status='pago';save();render();toast('Marcado como pago ✔')}}
+function delFin(id){if(confirm('Excluir lançamento?')){co.data.fin=co.data.fin.filter(x=>x.id!==id);save();render();toast('Excluído')}}
+
+function openFinModal(){
+  const cats=['Vendas','Delivery','Eventos','Fornecedores','Alimentos','Bebidas','Embalagens','Salário','Aluguel','Energia','Gás','Marketing','Impostos','Outros'];
+  modal('Novo lançamento financeiro',`
+    <div class="row2">
+      <div><label>Tipo</label><select id="f_type"><option value="in">Entrada (receita)</option><option value="out">Saída (despesa)</option></select></div>
+      <div><label>Valor (R$)</label><input id="f_val" type="number" step="0.01" min="0"></div>
+    </div>
+    <div class="mt"><label>Descrição</label><input id="f_desc" placeholder="Ex.: Vendas balcão 05/10"></div>
+    <div class="row2 mt">
+      <div><label>Categoria</label><select id="f_cat">${cats.map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div><label>Forma de pagamento</label><select id="f_method"><option>Pix</option><option>Dinheiro</option><option>Cartão de crédito</option><option>Cartão de débito</option><option>Boleto</option><option>Transferência</option></select></div>
+    </div>
+    <div class="row2 mt">
+      <div><label>Data</label><input id="f_date" type="date" value="${todayISO()}"></div>
+      <div><label>Vencimento (opcional)</label><input id="f_due" type="date"></div>
+    </div>
+    <div class="mt"><label>Status</label><select id="f_status"><option value="pendente">Pendente</option><option value="pago">Pago</option></select></div>
+  `,[
+    {t:'Salvar lançamento',fn:()=>{
+      const val=parseFloat($('f_val').value);
+      if(!val||val<=0){toast('Informe um valor');return}
+      co.data.fin.push({id:uid(),type:$('f_type').value,value:val,desc:$('f_desc').value.trim()||'Lançamento',cat:$('f_cat').value,method:$('f_method').value,date:$('f_date').value||todayISO(),due:$('f_due').value||null,status:$('f_status').value});
+      save();render();toast('Lançamento salvo ✔');
+    }}
+  ]);
+}
+
+/* ---------- ESTOQUE ---------- */
+function viewStock(){
+  const list=[...co.data.stock].sort((a,b)=>a.name.localeCompare(b.name));
+  const low=lowStockList();
+  const stockValue=list.reduce((s,p)=>s+p.qty*p.cost,0);
+  return `
+  <div class="grid g4">
+    ${kpi('Itens cadastrados',list.length,'')}
+    ${kpi('Valor em estoque',money(stockValue),'custo médio × quantidade')}
+    ${kpi('Alertas de mínimo',low.length,low.length?'repor urgente':'tudo em dia',low.length?'neg':'pos')}
+    ${kpi('Movimentações',co.data.moves.length,'entradas, saídas, perdas e ajustes')}
+  </div>
+  <div class="card mt">
+    <div class="card-title"><h3>Produtos em estoque</h3><button class="btn btn-primary btn-sm" onclick="openStockModal()">+ Produto</button></div>
+    <div class="tbl-wrap"><table>
+    <tr><th>Produto</th><th>Categoria</th><th>Unid.</th><th class="num">Atual</th><th class="num">Mín.</th><th class="num">Custo médio</th><th class="num">Total</th><th>Fornecedor</th><th></th></tr>
+    ${list.length?list.map(p=>`<tr>
+      <td><b>${esc(p.name)}</b></td><td>${esc(p.cat||'—')}</td><td>${esc(p.unit)}</td>
+      <td class="num"><b>${p.qty}</b></td><td class="num">${p.min}</td>
+      <td class="num">${money(p.cost)}</td><td class="num">${money(p.qty*p.cost)}</td>
+      <td>${esc(supplierName(p.supplierId))}</td>
+      <td class="num" style="white-space:nowrap">
+        <button class="icon-btn" title="Entrada" onclick="moveStock('${p.id}','in')">＋</button>
+        <button class="icon-btn" title="Saída" onclick="moveStock('${p.id}','out')">－</button>
+        <button class="icon-btn" title="Perda" onclick="moveStock('${p.id}','loss')">⚠</button>
+        <button class="icon-btn" title="Ajuste (definir saldo)" onclick="moveStock('${p.id}','adjust')">✎</button>
+        <button class="icon-btn" title="Excluir" onclick="delStock('${p.id}')">🗑</button>
+      </td></tr>`).join(''):'<tr><td colspan=9 class="empty">Nenhum produto cadastrado. Use “+ Produto”.</td></tr>'}
+    </table></div>
+  </div>
+  <div class="card mt">
+    <div class="card-title"><h3>Movimentações recentes</h3></div>
+    <div class="tbl-wrap"><table><tr><th>Data</th><th>Produto</th><th>Tipo</th><th class="num">Qtd</th><th>Nota</th></tr>
+    ${co.data.moves.slice(0,12).map(m=>{const p=co.data.stock.find(x=>x.id===m.stockId);return `<tr><td>${brDate(m.date)}</td><td>${esc(p?p.name:'—')}</td><td>${esc(m.type)}</td><td class="num">${m.qty}</td><td>${esc(m.note||'')}</td></tr>`}).join('')||'<tr><td colspan=5 class="empty">Sem movimentações</td></tr>'}
+    </table></div>
+  </div>`;
+}
+function moveStock(id,type){
+  const p=co.data.stock.find(x=>x.id===id);
+  if(!p)return;
+  const label={in:'Entrada',out:'Saída',loss:'Perda',adjust:'Ajuste para novo saldo'}[type];
+  const q=prompt(`${label} — ${p.name}\nQuantidade (${p.unit}):`,'1');
+  if(q===null)return;
+  const n=parseFloat(q.replace(',','.'));
+  if(isNaN(n)||n<0){toast('Quantidade inválida');return}
+  if(type==='in')p.qty+=n;
+  if(type==='out'||type==='loss'){if(n>p.qty){toast('Quantidade maior que o saldo');return}p.qty-=n}
+  if(type==='adjust')p.qty=n;
+  co.data.moves.unshift({id:uid(),stockId:p.id,type,date:todayISO(),qty:n,note:label});
+  save();render();toast(`${label} registrada ✔`);
+}
+function delStock(id){if(confirm('Excluir produto do estoque?')){co.data.stock=co.data.stock.filter(x=>x.id!==id);save();render();toast('Excluído')}}
+function openStockModal(){
+  modal('Produto de estoque',`
+    <div class="row2">
+      <div><label>Nome</label><input id="s_name" placeholder="Ex.: Carne bovina"></div>
+      <div><label>Categoria</label><select id="s_cat"><option>Alimentos</option><option>Bebidas</option><option>Embalagens</option><option>Limpeza</option><option>Outros</option></select></div>
+    </div>
+    <div class="row2 mt">
+      <div><label>Unidade</label><select id="s_unit"><option>kg</option><option>g</option><option>L</option><option>ml</option><option>un</option><option>pct</option><option>cx</option></select></div>
+      <div><label>Quantidade inicial</label><input id="s_qty" type="number" step="0.001" value="0"></div>
+    </div>
+    <div class="row2 mt">
+      <div><label>Estoque mínimo</label><input id="s_min" type="number" step="0.001" value="0"></div>
+      <div><label>Custo médio (R$)</label><input id="s_cost" type="number" step="0.01" value="0"></div>
+    </div>
+    <div class="mt"><label>Fornecedor principal</label><select id="s_supp"><option value="">—</option>${co.data.supp.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select></div>
+  `,[
+    {t:'Salvar produto',fn:()=>{
+      const name=$('s_name').value.trim();
+      if(!name){toast('Informe o nome');return}
+      co.data.stock.push({id:uid(),name,cat:$('s_cat').value,unit:$('s_unit').value,qty:parseFloat($('s_qty').value)||0,min:parseFloat($('s_min').value)||0,cost:parseFloat($('s_cost').value)||0,supplierId:$('s_supp').value||null});
+      save();render();toast('Produto salvo ✔');
+    }}
+  ]);
+}
+
+/* ---------- COMPRAS ---------- */
+function viewPurch(){
+  const list=[...co.data.purch].sort((a,b)=>b.date.localeCompare(a.date));
+  const cur=todayISO().slice(0,7);
+  const month=list.filter(p=>p.date.slice(0,7)===cur).length;
+  const spend=list.reduce((s,p)=>s+p.total,0);
+  return `
+  <div class="grid g4">
+    ${kpi('Compras registradas',list.length,'')}
+    ${kpi('Total em compras',money(spend),'')}
+    ${kpi('Compras no mês',month,'')}
+    ${kpi('Ticket médio',list.length?money(spend/list.length):money(0),'')}
+  </div>
+  <div class="card mt">
+    <div class="card-title"><h3>Histórico de compras</h3><button class="btn btn-primary btn-sm" onclick="openPurchModal()">+ Nova compra</button></div>
+    <div class="tbl-wrap"><table>
+    <tr><th>Data</th><th>Fornecedor</th><th>Itens</th><th class="num">Total</th><th>Status fin.</th><th></th></tr>
+    ${list.length?list.map(p=>`<tr>
+      <td>${brDate(p.date)}</td><td>${esc(supplierName(p.supplierId))}</td>
+      <td>${p.items.map(it=>{const pr=co.data.stock.find(x=>x.id===it.stockId);return esc((pr?pr.name:'—')+' ×'+it.qty)}).join(', ')}</td>
+      <td class="num"><b>${money(p.total)}</b></td>
+      <td><span class="tag ${p.finStatus==='pago'?'tag-paid':'tag-pend'}">${p.finStatus}</span></td>
+      <td class="num"><button class="icon-btn" onclick="delPurch('${p.id}')">🗑</button></td>
+    </tr>`).join(''):'<tr><td colspan=6 class="empty">Sem compras. Use “+ Nova compra”.</td></tr>'}
+    </table></div>
+  </div>`;
+}
+function delPurch(id){if(confirm('Excluir a compra? (estoque e financeiro NÃO são revertidos)')){co.data.purch=co.data.purch.filter(x=>x.id!==id);save();render();toast('Compra excluída')}}
+let purchItems=[];
+function openPurchModal(){
+  if(!co.data.stock.length){toast('Cadastre produtos no Estoque antes de registrar compra');return}
+  if(!co.data.supp.length){toast('Cadastre um fornecedor antes');return}
+  purchItems=[{stockId:co.data.stock[0].id,qty:1,price:co.data.stock[0].cost}];
+  modal('Nova compra',`
+    <div class="row2">
+      <div><label>Fornecedor</label><select id="p_supp">${co.data.supp.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select></div>
+      <div><label>Data</label><input id="p_date" type="date" value="${todayISO()}"></div>
+    </div>
+    <div class="mt"><label>Itens da compra</label><div id="p_items"></div>
+      <button class="btn btn-sm mt" onclick="addPurchItem()">+ Adicionar produto</button></div>
+    <div id="p_total" class="mt"></div>
+    <div class="row2 mt">
+      <div><label>Forma de pagamento</label><select id="p_method"><option>Pix</option><option>Dinheiro</option><option>Boleto</option><option>Cartão</option></select></div>
+      <div><label>Status financeiro</label><select id="p_finStatus"><option value="pendente">Pendente (gera conta a pagar)</option><option value="pago">Pago</option></select></div>
+    </div>
+    <div class="mt"><label>Observações</label><textarea id="p_note" rows="2"></textarea></div>
+  `,[
+    {t:'Registrar compra',fn:()=>{
+      if(!purchItems.length){toast('Adicione produtos');return}
+      let total=0;const its=[];
+      for(const it of purchItems){
+        const pr=co.data.stock.find(x=>x.id===it.stockId);
+        if(!pr||it.qty<=0)continue;
+        const sub=it.qty*it.price; total+=sub;
+        /* custo médio ponderado */
+        const oq=pr.qty, oc=pr.cost;
+        pr.qty+=it.qty;
+        pr.cost=(oq+it.qty)>0?((oq*oc+it.qty*it.price)/(oq+it.qty)):it.price;
+        its.push({stockId:pr.id,qty:it.qty,price:it.price});
+        co.data.moves.unshift({id:uid(),stockId:pr.id,type:'in',date:todayISO(),qty:it.qty,note:'Compra'});
+      }
+      if(!its.length){toast('Nenhum item válido');return}
+      co.data.purch.push({id:uid(),supplierId:$('p_supp').value,date:$('p_date').value||todayISO(),items:its,total,method:$('p_method').value,finStatus:$('p_finStatus').value,note:$('p_note').value.trim()});
+      co.data.fin.push({id:uid(),type:'out',value:total,desc:'Compra — '+supplierName($('p_supp').value),cat:'Fornecedores',method:$('p_method').value,date:$('p_date').value||todayISO(),due:$('p_date').value||todayISO(),status:$('p_finStatus').value});
+      save();render();toast('Compra registrada: estoque e financeiro atualizados ✔');
+    }}
+  ]);
+  renderPurchItems();
+}
+function renderPurchItems(){
+  const el=$('p_items'); if(!el)return;
+  el.innerHTML=purchItems.map((it,i)=>{const pr=co.data.stock.find(x=>x.id===it.stockId);return `
+    <div class="row3" style="align-items:end;margin-bottom:8px">
+      <div><select onchange="purchItems[${i}].stockId=this.value;renderPurchItems()">${co.data.stock.map(x=>`<option value="${x.id}" ${x.id===it.stockId?'selected':''}>${esc(x.name)} (${x.unit})</option>`).join('')}</select></div>
+      <div><input type="number" step="0.001" min="0" placeholder="Qtd" value="${it.qty}" oninput="purchItems[${i}].qty=parseFloat(this.value)||0;renderPurchTotal()"></div>
+      <div><input type="number" step="0.01" min="0" placeholder="Preço un." value="${it.price}" oninput="purchItems[${i}].price=parseFloat(this.value)||0;renderPurchTotal()"></div>
+    </div>`}).join('');
+  renderPurchTotal();
+}
+function renderPurchTotal(){
+  const el=$('p_total'); if(!el)return;
+  const total=purchItems.reduce((s,it)=>s+it.qty*it.price,0);
+  el.innerHTML=`<div class="kpi-label">Total da compra</div><div class="kpi-value" style="font-size:18px">${money(total)}</div>`;
+}
+function addPurchItem(){purchItems.push({stockId:co.data.stock[0].id,qty:1,price:co.data.stock[0].cost});renderPurchItems()}
+
+/* ---------- FORNECEDORES ---------- */
+function viewSupp(){
+  const list=[...co.data.supp].sort((a,b)=>a.name.localeCompare(b.name));
+  return `
+  <div class="grid g4">
+    ${kpi('Fornecedores',list.length,'')}
+    ${kpi('Com compras',list.filter(s=>co.data.purch.some(p=>p.supplierId===s.id)).length,'')}
+    ${kpi('Com WhatsApp',list.filter(s=>s.whats).length,'')}
+    ${kpi('Com e-mail',list.filter(s=>s.email).length,'')}
+  </div>
+  <div class="card mt">
+    <div class="card-title"><h3>Fornecedores</h3><button class="btn btn-primary btn-sm" onclick="openSuppModal()">+ Fornecedor</button></div>
+    <div class="tbl-wrap"><table>
+    <tr><th>Nome</th><th>CPF/CNPJ</th><th>Telefone</th><th>WhatsApp</th><th>E-mail</th><th></th></tr>
+    ${list.length?list.map(s=>`<tr>
+      <td><b>${esc(s.name)}</b></td><td>${esc(s.doc||'—')}</td><td>${esc(s.phone||'—')}</td>
+      <td>${s.whats?`<a href="https://wa.me/55${esc(s.whats.replace(/\D/g,''))}" target="_blank" style="color:var(--green)">${esc(s.whats)}</a>`:'—'}</td>
+      <td>${esc(s.email||'—')}</td>
+      <td class="num" style="white-space:nowrap">
+        <button class="icon-btn" onclick="openSuppModal('${s.id}')">✎</button>
+        <button class="icon-btn" onclick="delSupp('${s.id}')">🗑</button>
+      </td></tr>`).join(''):'<tr><td colspan=6 class="empty">Nenhum fornecedor. Use “+ Fornecedor”.</td></tr>'}
+    </table></div>
+  </div>
+  <div class="card mt">
+    <div class="card-title"><h3>Compras por fornecedor</h3></div>
+    <div class="tbl-wrap"><table><tr><th>Fornecedor</th><th class="num">Compras</th><th class="num">Total comprado</th><th class="num">Última compra</th></tr>
+    ${list.map(s=>{const ps=co.data.purch.filter(p=>p.supplierId===s.id);const tot=ps.reduce((x,p)=>x+p.total,0);const last=ps.map(p=>p.date).sort().pop();
+    return `<tr><td><b>${esc(s.name)}</b></td><td class="num">${ps.length}</td><td class="num">${money(tot)}</td><td class="num">${last?brDate(last):'—'}</td></tr>`}).join('')||'<tr><td colspan=4 class="empty">Sem fornecedores</td></tr>'}
+    </table></div>
+  </div>`;
+}
+function openSuppModal(id){
+  const s=id?co.data.supp.find(x=>x.id===id):null;
+  modal(s?'Editar fornecedor':'Novo fornecedor',`
+    <div><label>Nome</label><input id="v_name" value="${esc(s?.name||'')}"></div>
+    <div class="row2 mt">
+      <div><label>CPF/CNPJ</label><input id="v_doc" value="${esc(s?.doc||'')}"></div>
+      <div><label>Telefone</label><input id="v_phone" value="${esc(s?.phone||'')}"></div>
+    </div>
+    <div class="row2 mt">
+      <div><label>WhatsApp</label><input id="v_whats" value="${esc(s?.whats||'')}"></div>
+      <div><label>E-mail</label><input id="v_email" value="${esc(s?.email||'')}"></div>
+    </div>
+    <div class="mt"><label>Endereço</label><input id="v_addr" value="${esc(s?.addr||'')}"></div>
+    <div class="mt"><label>Observações</label><textarea id="v_obs" rows="2">${esc(s?.obs||'')}</textarea></div>
+  `,[
+    {t:'Salvar fornecedor',fn:()=>{
+      const name=$('v_name').value.trim();
+      if(!name){toast('Informe o nome');return}
+      const vals={name,doc:$('v_doc').value.trim(),phone:$('v_phone').value.trim(),whats:$('v_whats').value.trim(),email:$('v_email').value.trim(),addr:$('v_addr').value.trim(),obs:$('v_obs').value.trim()};
+      if(s)Object.assign(s,vals);
+      else co.data.supp.push({id:uid(),...vals});
+      save();render();toast('Fornecedor salvo ✔');
+    }}
+  ]);
+}
+function delSupp(id){if(confirm('Excluir fornecedor?')){co.data.supp=co.data.supp.filter(x=>x.id!==id);save();render();toast('Excluído')}}
+
+/* ---------- PRODUTOS & PRATOS ---------- */
+function dishCost(d){return (d.ingredients||[]).reduce((s,i)=>{const p=co.data.stock.find(x=>x.id===i.stockId);return s+(p?p.cost*i.qty:0)},0)}
+function dishMargin(d){const c=dishCost(d);return d.price>0?Math.round((d.price-c)/d.price*100):0}
+function viewProds(){
+  const list=[...co.data.prods].sort((a,b)=>a.name.localeCompare(b.name));
+  const dishes=list.filter(p=>p.kind==='dish');
+  const prods=list.filter(p=>p.kind==='product');
+  const avgM=dishes.length?Math.round(dishes.reduce((s,d)=>s+dishMargin(d),0)/dishes.length):null;
+  return `
+  <div class="grid g4">
+    ${kpi('Produtos (venda)',prods.length,'')}
+    ${kpi('Pratos (com receita)',dishes.length,'')}
+    ${kpi('Margem média',avgM===null?'—':avgM+'%','dos pratos',avgM!==null?(avgM>=40?'pos':avgM>0?'warn':'neg'):'')}
+    ${kpi('Custo médio prato',dishes.length?money(dishes.reduce((s,d)=>s+dishCost(d),0)/dishes.length):'—','')}
+  </div>
+  <div class="card mt">
+    <div class="card-title"><h3>Produtos e pratos</h3><button class="btn btn-primary btn-sm" onclick="openProdModal()">+ Produto/Prato</button></div>
+    <div class="tbl-wrap"><table>
+    <tr><th>Item</th><th>Tipo</th><th class="num">Custo estimado</th><th class="num">Preço de venda</th><th class="num">Margem</th><th></th></tr>
+    ${list.length?list.map(p=>{
+      const cost=p.kind==='dish'?dishCost(p):(p.costPrice||0);
+      const price=p.price||0;
+      const mg=price>0?Math.round((price-cost)/price*100):0;
+      return `<tr>
+        <td><b>${esc(p.name)}</b></td>
+        <td><span class="tag ${p.kind==='dish'?'tag-info':'tag-paid'}">${p.kind==='dish'?'Prato':'Produto'}</span> <span class="muted small">${esc(p.cat||'')}</span></td>
+        <td class="num">${money(cost)}</td><td class="num">${money(price)}</td>
+        <td class="num ${mg>=40?'pos':mg>0?'warn':'neg'}"><b>${price>0?mg+'%':'—'}</b></td>
+        <td class="num" style="white-space:nowrap">
+          <button class="icon-btn" onclick="openProdModal('${p.id}')">✎</button>
+          <button class="icon-btn" onclick="delProd('${p.id}')">🗑</button>
+        </td></tr>`}).join(''):'<tr><td colspan=6 class="empty">Cadastre produtos de venda e pratos com receita.</td></tr>'}
+    </table></div>
+  </div>`;
+}
+let ings=[];
+function openProdModal(id){
+  const p=id?co.data.prods.find(x=>x.id===id):null;
+  const isDish=p?p.kind==='dish':false;
+  ings=p&&p.ingredients?JSON.parse(JSON.stringify(p.ingredients)):[];
+  modal(p?'Editar produto/prato':'Novo produto/prato',`
+    <div class="row2">
+      <div><label>Tipo</label>
+        <select id="pr_kind" ${p?'disabled':''} onchange="toggleProdKind()">
+          <option value="product" ${!isDish?'selected':''}>Produto de venda</option>
+          <option value="dish" ${isDish?'selected':''}>Prato (com receita)</option>
+        </select></div>
+      <div><label>Nome</label><input id="pr_name" value="${esc(p?.name||'')}"></div>
+    </div>
+    <div class="row2 mt">
+      <div><label>Categoria</label><select id="pr_cat"><option>Lanches</option><option>Pizzas</option><option>Porções</option><option>Bebidas</option><option>Sobremesas</option><option>Outros</option></select></div>
+      <div><label>Preço de venda (R$)</label><input id="pr_price" type="number" step="0.01" value="${p?p.price:''}"></div>
+    </div>
+    <div id="pr_dishFields" style="display:${isDish?'block':'none'}">
+      <div class="mt"><label>Ingredientes (do estoque)</label>
+        <div id="pr_ing"></div>
+        <button class="btn btn-sm mt" onclick="addIng()">+ Ingrediente</button>
+        <div class="row2 mt">
+          <div><label>Custo estimado</label><div id="pr_cost" class="kpi-value" style="font-size:17px">—</div></div>
+          <div><label>Margem estimada</label><div id="pr_margin" class="kpi-value" style="font-size:17px">—</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="mt" id="pr_costPriceWrap" style="display:${isDish?'none':'block'}">
+      <label>Custo do produto (R$, opcional)</label><input id="pr_costPrice" type="number" step="0.01" value="${p&&!isDish?(p.costPrice||''):''}">
+    </div>
+  `,[
+    {t:'Salvar',fn:()=>{
+      const name=$('pr_name').value.trim();
+      if(!name){toast('Informe o nome');return}
+      const kind=p?p.kind:$('pr_kind').value;
+      const price=parseFloat($('pr_price').value)||0;
+      let data;
+      if(kind==='dish'){
+        if(!ings.length){toast('Adicione ingredientes');return}
+        data={id:p?p.id:uid(),kind,name,cat:$('pr_cat').value,ingredients:ings,price};
+      } else {
+        data={id:p?p.id:uid(),kind:'product',name,cat:$('pr_cat').value,price,costPrice:parseFloat($('pr_costPrice').value)||0};
+      }
+      if(p){const i=co.data.prods.findIndex(x=>x.id===p.id);co.data.prods[i]=data}
+      else co.data.prods.push(data);
+      save();render();toast('Item salvo ✔');
+    }}
+  ]);
+  if(isDish)renderIngs();
+}
+function toggleProdKind(){
+  const dish=$('pr_kind').value==='dish';
+  $('pr_dishFields').style.display=dish?'block':'none';
+  $('pr_costPriceWrap').style.display=dish?'none':'block';
+}
+function renderIngs(){
+  const el=$('pr_ing'); if(!el)return;
+  if(!ings.length){el.innerHTML='<div class="empty small">Sem ingredientes</div>';updateDishCost();return}
+  el.innerHTML=ings.map((ing,i)=>{const p=co.data.stock.find(x=>x.id===ing.stockId);return `
+    <div class="row3" style="align-items:end;margin-bottom:8px">
+      <div><select onchange="ings[${i}].stockId=this.value;renderIngs()">${co.data.stock.map(x=>`<option value="${x.id}" ${x.id===ing.stockId?'selected':''}>${esc(x.name)} (${x.unit})</option>`).join('')}</select></div>
+      <div><input type="number" step="0.001" min="0" value="${ing.qty}" oninput="ings[${i}].qty=parseFloat(this.value)||0;updateDishCost()"></div>
+      <div><button class="icon-btn" onclick="ings.splice(${i},1);renderIngs()">🗑</button></div>
+    </div>`}).join('');
+  updateDishCost();
+}
+function updateDishCost(){
+  const el=$('pr_cost'); if(!el)return;
+  const cost=ings.reduce((s,i)=>{const p=co.data.stock.find(x=>x.id===i.stockId);return s+(p?p.cost*i.qty:0)},0);
+  const price=parseFloat($('pr_price').value)||0;
+  el.textContent=money(cost);
+  const mg=price>0?Math.round((price-cost)/price*100):null;
+  const m=$('pr_margin');
+  m.textContent=mg===null?'—':mg+'% '+(mg>=40?'🟢':mg>0?'🟡':'🔴');
+}
+function addIng(){if(!co.data.stock.length){toast('Cadastre ingredientes no Estoque primeiro');return}ings.push({stockId:co.data.stock[0].id,qty:0.15});renderIngs()}
+function delProd(id){if(confirm('Excluir item?')){co.data.prods=co.data.prods.filter(x=>x.id!==id);save();render();toast('Excluído')}}
+
+/* ---------- CONFIGURAÇÕES ---------- */
+function viewSettings(){
+  const s=co.settings;
+  return `
+  <div class="grid g2">
+    <div class="card">
+      <div class="card-title"><h3>Dados da empresa</h3></div>
+      <div><label>Nome</label><input id="st_name" value="${esc(s.name||'')}"></div>
+      <div class="row2 mt">
+        <div><label>Telefone/WhatsApp</label><input id="st_phone" value="${esc(s.phone||'')}"></div>
+        <div><label>CNPJ</label><input id="st_doc" value="${esc(s.doc||'')}"></div>
+      </div>
+      <div class="mt"><label>E-mail</label><input id="st_email" value="${esc(s.email||'')}"></div>
+      <div class="mt"><label>Endereço</label><input id="st_addr" value="${esc(s.addr||'')}"></div>
+      <div class="mt"><label>Senha do acesso</label><input id="st_pass" type="password" value="${esc(co.pass)}"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><h3>Preferências</h3></div>
+      <div><label>Moeda</label><select disabled><option>Real (R$)</option></select></div>
+      <div class="mt"><label>Idioma</label><select disabled><option>Português (BR)</option></select></div>
+      <div class="mt"><label>Fuso</label><select disabled><option>América/São Paulo</option></select></div>
+      <p class="small muted mt">Em breve: mais moedas, idiomas e permissões por usuário (SaaS).</p>
+    </div>
+  </div>
+  <div class="card mt">
+    <div class="card-title"><h3>Conta & dados</h3></div>
+    <p class="small muted">Multiempresa: cada empresa vê apenas os próprios dados, isolados por conta. A camada de dados é isolada — pronta para migrar para Supabase (Postgres + Auth) mantendo telas e fluxos.</p>
+    <p class="small muted mt">Criada em ${brDate(co.created)} · ID interno: ${esc(co.id)}</p>
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="saveSettings()">Salvar configurações</button>
+      <button class="btn btn-danger" onclick="wipeCompany()">Apagar TODOS os dados desta empresa</button>
+    </div>
+  </div>`;
+}
+function saveSettings(){
+  co.name=$('st_name').value.trim()||co.name;
+  Object.assign(co.settings,{name:co.name,phone:$('st_phone').value.trim(),doc:$('st_doc').value.trim(),email:$('st_email').value.trim(),addr:$('st_addr').value.trim()});
+  if($('st_pass').value.length>=4)co.pass=$('st_pass').value;
+  save();updateBadges();toast('Configurações salvas ✔');
+}
+function wipeCompany(){if(confirm('ATENÇÃO: isso apaga TODOS os dados desta empresa (financeiro, estoque, compras, fornecedores, produtos). Confirmar?')){co.data={fin:[],stock:[],moves:[],purch:[],supp:[],prods:[]};save();render();toast('Dados apagados')}}
+
+/* ---------- MODAL helper ---------- */
+function modal(title,body,actions){
+  const r=$('modalRoot');
+  r.innerHTML=`<div class="overlay" onclick="if(event.target===this)this.remove()">
+    <div class="modal">
+      <h3>${esc(title)}</h3>
+      ${body}
+      <div class="modal-actions">
+        <button class="btn" onclick="document.getElementById('modalRoot').innerHTML=''">Cancelar</button>
+        ${actions.map((a,i)=>`<button class="btn btn-primary" data-act="${i}">${esc(a.t)}</button>`).join('')}
+      </div>
+    </div>
+  </div>`;
+  actions.forEach((a,i)=>{r.querySelector(`[data-act="${i}"]`).onclick=()=>{a.fn();r.innerHTML=''}});
+}
+
+/* ---------- BOOT ---------- */
+(function boot(){
+  if(db.session && db.companies[db.session.companyId]) enter(db.session.companyId);
+  else renderLogin();
+})();
+</script>
+</body>
+</html>
