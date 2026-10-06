@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GestorPro — Gestão para alimentação</title>
+<title>RSM PDV — Gestão para alimentação</title>
 <style>
 :root{
   --bg:#faf5ee; --panel:#ffffff; --panel2:#f4ecdf; --line:#e7dcc9;
@@ -59,8 +59,8 @@ h3{font-size:15px}
 .g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
 .g2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 1px 3px rgba(61,44,30,.05)}
-.kpi-label{font-size:12px;color:var(--mut);font-weight:600;margin-bottom:6px}
-.kpi-value{font-size:22px;font-weight:800}
+.kpi-label{font-size:11.5px;color:var(--mut);font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+.kpi-value{font-size:21px;font-weight:800;letter-spacing:-.3px}
 .kpi-sub{font-size:12px;margin-top:4px}
 .card-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
 
@@ -71,7 +71,7 @@ td{padding:9px 10px;border-bottom:1px solid var(--line)}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:rgba(61,44,30,.03)}
 td.num,th.num{text-align:right}
-.tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:700}
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:600;letter-spacing:.2px}
 .tag-paid{background:rgba(22,163,74,.12);color:var(--green)}
 .tag-pend{background:rgba(217,119,6,.12);color:var(--amber)}
 .tag-over{background:rgba(220,38,38,.12);color:var(--red)}
@@ -140,7 +140,7 @@ td.num,th.num{text-align:right}
 <!-- ============ LOGIN ============ -->
 <div id="login">
   <div class="login-card">
-    <div class="logo"><span class="logo-badge">📊</span> GestorPro</div>
+    <div class="logo"><span class="logo-badge">📊</span> RSM PDV</div>
     <h1 id="loginTitle">Entrar na sua empresa</h1>
     <p class="sub" id="loginSub">Selecione a empresa e digite a senha.</p>
     <label>Empresa</label>
@@ -163,7 +163,7 @@ td.num,th.num{text-align:right}
 <div id="app">
   <div class="sidebar" id="sidebar">
     <div class="side-head">
-      <div class="logo"><span class="logo-badge">📊</span> <span id="coName">GestorPro</span></div>
+      <div class="logo"><span class="logo-badge">📊</span> <span id="coName">RSM PDV</span></div>
     </div>
     <nav class="side-nav" id="nav">
       <div class="nav-item active" data-mod="dash" onclick="go('dash')"><span class="ic">📈</span> Dashboard</div>
@@ -224,7 +224,7 @@ td.num,th.num{text-align:right}
 
 <script>
 /* ============================================================
-   GestorPro MVP v1.1 — arquivo único
+   RSM PDV v1.2 — arquivo único
    Dados por empresa (multiempresa) em localStorage.
    Camada DB isolada: pronta para trocar por Supabase depois.
    ============================================================ */
@@ -242,8 +242,17 @@ const MODULES = {
 
 /* ---------- DB LAYER (trocar por Supabase) ---------- */
 const DB = {
-  read(){ try{return JSON.parse(localStorage.getItem('gestorpro_db'))||{companies:{},session:null}}catch(e){return {companies:{},session:null}} },
-  write(d){ localStorage.setItem('gestorpro_db', JSON.stringify(d)) },
+  read(){
+    try{
+      const cur=localStorage.getItem('rsm_pdv_db');
+      if(cur)return JSON.parse(cur)||{companies:{},session:null};
+      /* migração: v1.1 usava gestorpro_db */
+      const old=localStorage.getItem('gestorpro_db');
+      if(old){localStorage.setItem('rsm_pdv_db',old);return JSON.parse(old)}
+      return {companies:{},session:null};
+    }catch(e){return {companies:{},session:null}}
+  },
+  write(d){ localStorage.setItem('rsm_pdv_db', JSON.stringify(d)) },
 };
 
 let db = DB.read();
@@ -259,11 +268,13 @@ const todayISO=()=>new Date().toISOString().slice(0,10);
 const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36);
 const brDate=iso=>iso?iso.split('-').reverse().join('/'):'—';
 function toast(msg){const t=$('toast');t.textContent=msg;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2600)}
-/* status efetivo: pago > vencido (venceu e não pago) > pendente */
-function effectiveStatus(f){ if(f.status==='pago')return 'pago'; const due=f.due||f.date; return (due && due<todayISO()) ? 'vencido' : 'pendente'; }
+/* status efetivo: pago > vencido (venceu e não pago) > pendente; cancelado = fora dos cálculos */
+function effectiveStatus(f){ if(f.status==='pago')return 'pago'; if(f.status==='cancelado')return 'cancelado'; const due=f.due||f.date; return (due && due<todayISO()) ? 'vencido' : 'pendente'; }
+function liveFin(){ return co.data.fin.filter(f=>effectiveStatus(f)!=='cancelado'); }
+function daysLate(f){ const due=f.due||f.date; return Math.max(0,Math.round((new Date(todayISO())-new Date(due))/86400000)); }
 function save(){ db.companies[co.id]=co; DB.write(db); }
-function activeFin(){ return co.data.fin.filter(f=>effectiveStatus(f)!=='pago'); }
-function lowStockList(){ return co.data.stock.filter(p=>p.qty<=p.min); }
+function activeFin(){ return liveFin().filter(f=>effectiveStatus(f)!=='pago'); }
+function lowStockList(){ return co.data.stock.filter(p=>p.qty<=p.min&&!p.inactive); }
 function supplierName(id){const s=co.data.supp.find(x=>x.id===id);return s?s.name:'—'}
 
 /* ---------- LOGIN ---------- */
@@ -378,23 +389,23 @@ function exportCSV(filename, rows){
 }
 function exportFin(){
   const rows=[['Data','Vencimento','Tipo','Descrição','Categoria','Forma','Status','Valor (R$)']];
-  [...co.data.fin].sort((a,b)=>b.date.localeCompare(a.date)).forEach(f=>rows.push([brDate(f.date),brDate(f.due||f.date),f.type==='in'?'Entrada':'Saída',f.desc,f.cat||'',f.method||'',effectiveStatus(f),f.value.toFixed(2).replace('.',',')]));
-  exportCSV('gestorpro-financeiro.csv',rows);
+  [...liveFin()].sort((a,b)=>b.date.localeCompare(a.date)).forEach(f=>rows.push([brDate(f.date),brDate(f.due||f.date),f.type==='in'?'Entrada':'Saída',f.desc,f.cat||'',f.method||'',effectiveStatus(f),f.value.toFixed(2).replace('.',',')]));
+  exportCSV('rsm-pdv-financeiro.csv',rows);
 }
 function exportStock(){
-  const rows=[['Produto','Categoria','Unidade','Quantidade','Mínimo','Custo médio (R$)','Valor total (R$)','Fornecedor']];
-  co.data.stock.forEach(p=>rows.push([p.name,p.cat||'',p.unit,p.qty,p.min,p.cost.toFixed(2).replace('.',','),(p.qty*p.cost).toFixed(2).replace('.',','),supplierName(p.supplierId)]));
-  exportCSV('gestorpro-estoque.csv',rows);
+  const rows=[['Produto','Categoria','Unidade','Quantidade','Mínimo','Último custo (R$)','Custo médio (R$)','Valor total (R$)','Fornecedor']];
+  co.data.stock.filter(p=>!p.inactive).forEach(p=>rows.push([p.name,p.cat||'',p.unit,p.qty,p.min,(p.lastCost!==null&&p.lastCost!==undefined)?p.lastCost.toFixed(2).replace('.',','):'',p.cost.toFixed(2).replace('.',','),(p.qty*p.cost).toFixed(2).replace('.',','),supplierName(p.supplierId)]));
+  exportCSV('rsm-pdv-estoque.csv',rows);
 }
 function exportPurch(){
   const rows=[['Data','Fornecedor','Itens','Total (R$)','Forma','Status financeiro']];
-  [...co.data.purch].sort((a,b)=>b.date.localeCompare(a.date)).forEach(p=>rows.push([brDate(p.date),supplierName(p.supplierId),p.items.map(it=>{const pr=co.data.stock.find(x=>x.id===it.stockId);return (pr?pr.name:'—')+' x'+it.qty}).join(', '),p.total.toFixed(2).replace('.',','),p.method||'',p.finStatus]));
-  exportCSV('gestorpro-compras.csv',rows);
+  [...co.data.purch].sort((a,b)=>b.date.localeCompare(a.date)).forEach(p=>rows.push([brDate(p.date),supplierName(p.supplierId),p.items.map(it=>{const pr=co.data.stock.find(x=>x.id===it.stockId);return (pr?pr.name:'—')+' x'+it.qty}).join(', '),p.total.toFixed(2).replace('.',','),p.method||'',p.canceled?'cancelada':p.finStatus]));
+  exportCSV('rsm-pdv-compras.csv',rows);
 }
 
 /* ---------- DASHBOARD ---------- */
 function viewDash(){
-  const fin=co.data.fin;
+  const fin=liveFin();
   const cur=todayISO().slice(0,7);
   const inM=fin.filter(f=>f.type==='in'&&f.date.slice(0,7)===cur).reduce((s,f)=>s+f.value,0);
   const outM=fin.filter(f=>f.type==='out'&&f.date.slice(0,7)===cur).reduce((s,f)=>s+f.value,0);
@@ -410,13 +421,26 @@ function viewDash(){
   const max=Math.max(...inS,...outS,1);
   const bars=months.map((m,i)=>`<div class="bar-g"><div class="bars"><div class="b in" style="height:${Math.max(2,inS[i]/max*130)}px" title="Receitas: ${money(inS[i])}"></div><div class="b out" style="height:${Math.max(2,outS[i]/max*130)}px" title="Despesas: ${money(outS[i])}"></div></div><div class="lb">${m.label}</div></div>`).join('');
   const margem=inM>0?((result/inM)*100).toFixed(1).replace('.',',')+'%':'—';
-  const stockValue=co.data.stock.reduce((s,p)=>s+p.qty*p.cost,0);
-  const purchMonth=co.data.purch.filter(p=>p.date.slice(0,7)===cur);
+  const stockValue=co.data.stock.filter(p=>!p.inactive).reduce((s,p)=>s+p.qty*p.cost,0);
+  const purchMonth=co.data.purch.filter(p=>p.date.slice(0,7)===cur&&!p.canceled);
   const receivable=fin.filter(f=>f.type==='in'&&effectiveStatus(f)!=='pago').reduce((s,f)=>s+f.value,0);
+  /* comparação com mês anterior */
+  const prev=new Date(); prev.setMonth(prev.getMonth()-1);
+  const prevKey=prev.toISOString().slice(0,7);
+  const inP=fin.filter(f=>f.type==='in'&&f.date.slice(0,7)===prevKey).reduce((s,f)=>s+f.value,0);
+  const outP=fin.filter(f=>f.type==='out'&&f.date.slice(0,7)===prevKey).reduce((s,f)=>s+f.value,0);
+  const cmp=(a,b,inv)=>{if(!b)return '';const d=((a-b)/b*100);const up=d>=0;const good=inv?!up:up;return `<span class="${good?'pos':'neg'} small"> ${up?'▲':'▼'} ${Math.abs(d).toFixed(0)}% vs mês anterior</span>`};
+  /* vencimentos próximos (7 dias) */
+  const soon=pend.filter(f=>effectiveStatus(f)==='pendente'&&(f.due||f.date)<=(()=>{const d=new Date();d.setDate(d.getDate()+7);return d.toISOString().slice(0,10)})());
+  const late=pend.filter(f=>effectiveStatus(f)==='vencido');
+  const alerts=[];
+  if(late.length)alerts.push(`<b>${late.length}</b> conta(s) vencida(s) — ${money(late.reduce((s,f)=>s+f.value,0))}`);
+  if(soon.length)alerts.push(`<b>${soon.length}</b> vencendo em até 7 dias`);
+  if(low.length)alerts.push(`<b>${low.length}</b> produto(s) abaixo do mínimo`);
   return `
   <div class="grid g4">
-    ${kpi('Faturamento',money(inM),'entradas do mês','pos')}
-    ${kpi('Despesas',money(outM),'saídas do mês','neg')}
+    ${kpi('Faturamento',money(inM),cmp(inM,inP)+'entradas do mês','pos')}
+    ${kpi('Despesas',money(outM),cmp(outM,outP,true)+'saídas do mês','neg')}
     ${kpi('Resultado do mês',money(result),result>=0?'positivo':'negativo',result>=0?'pos':'neg')}
     ${kpi('Margem estimada',margem,'faturamento - despesas',inM>0?(result>=0?'pos':'neg'):'')}
   </div>
@@ -426,6 +450,7 @@ function viewDash(){
     ${kpi('Contas pendentes',money(pendTotal),pend.length+' a pagar/receber','warn')}
     ${kpi('A receber',money(receivable),'entradas ainda não pagas','pos')}
   </div>
+  ${alerts.length?`<div class="card mt" style="border-left:4px solid var(--amber)"><div class="kpi-label" style="margin-bottom:6px">⚠️ Alertas do negócio</div>${alerts.map(a=>`<div class="small" style="padding:2px 0">• ${a}</div>`).join('')}</div>`:''}
   <div class="grid g2 mt">
     <div class="card">
       <div class="card-title"><h3>Receitas x Despesas — 6 meses</h3><span class="tag tag-info">em R$</span></div>
@@ -442,14 +467,14 @@ function viewDash(){
   <div class="grid g2 mt">
     <div class="card">
       <div class="card-title"><h3>Compras recentes</h3><button class="btn btn-sm" onclick="go('purch')">Ver compras</button></div>
-      <div class="tbl-wrap"><table><tr><th>Data</th><th>Fornecedor</th><th class="num">Total</th></tr>
-      ${lastPurch.length?lastPurch.map(p=>`<tr><td>${brDate(p.date)}</td><td>${esc(supplierName(p.supplierId))}</td><td class="num">${money(p.total)}</td></tr>`).join(''):'<tr><td colspan=3 class="empty">Sem compras</td></tr>'}
+      <div class="tbl-wrap"><table><tr><th>Data</th><th>Fornecedor</th><th class="num">Total</th><th>Status</th></tr>
+      ${lastPurch.length?lastPurch.map(p=>`<tr><td>${brDate(p.date)}</td><td>${esc(supplierName(p.supplierId))}</td><td class="num">${money(p.total)}</td><td>${p.canceled?'<span class="tag">cancelada</span>':`<span class="tag ${p.finStatus==='pago'?'tag-paid':'tag-pend'}">${p.finStatus}</span>`}</td></tr>`).join(''):'<tr><td colspan=4 class="empty">Sem compras</td></tr>'}
       </table></div>
     </div>
     <div class="card">
-      <div class="card-title"><h3>Contas pendentes</h3><button class="btn btn-sm" onclick="go('fin')">Ver financeiro</button></div>
-      <div class="tbl-wrap"><table><tr><th>Vencimento</th><th>Descrição</th><th class="num">Valor</th></tr>
-      ${pend.length?pend.slice(0,6).map(f=>`<tr><td>${brDate(f.due||f.date)}</td><td>${esc(f.desc)}</td><td class="num ${effectiveStatus(f)==='vencido'?'neg':''}">${money(f.value)}</td></tr>`).join(''):'<tr><td colspan=3 class="empty">Nada pendente</td></tr>'}
+      <div class="card-title"><h3>Contas próximas do vencimento</h3><button class="btn btn-sm" onclick="go('fin')">Ver financeiro</button></div>
+      <div class="tbl-wrap"><table><tr><th>Vencimento</th><th>Descrição</th><th>Status</th><th class="num">Valor</th></tr>
+      ${[...late,...soon].length?[...late,...soon].slice(0,6).map(f=>{const st=effectiveStatus(f);return `<tr><td>${brDate(f.due||f.date)}</td><td>${esc(f.desc)}</td><td><span class="tag ${st==='vencido'?'tag-over':'tag-pend'}">${st==='vencido'?'vencido ('+daysLate(f)+'d)':'em 7 dias'}</span></td><td class="num ${st==='vencido'?'neg':''}">${money(f.value)}</td></tr>`}).join(''):'<tr><td colspan=4 class="empty">Nada vencendo</td></tr>'}
       </table></div>
     </div>
   </div>`;
@@ -467,7 +492,7 @@ function finPeriodRange(){
   return ['0000-01-01','9999-12-31'];
 }
 function filteredFin(){
-  let list=[...co.data.fin];
+  let list=[...liveFin()];
   const [a,b]=finPeriodRange();
   list=list.filter(f=>f.date>=a&&f.date<=b);
   const t=$('finType')?$('finType').value:'all';
@@ -481,13 +506,17 @@ function filteredFin(){
   return list.sort((x,y)=>y.date.localeCompare(x.date));
 }
 function viewFin(){
-  const cats=[...new Set(co.data.fin.map(f=>f.cat).filter(Boolean))];
+  const cats=[...new Set(liveFin().map(f=>f.cat).filter(Boolean))];
   const sub=subMod.pagar?'pagar':subMod.receber?'receber':'geral';
   const list=filteredFin();
   const inT=list.filter(f=>f.type==='in').reduce((s,f)=>s+f.value,0);
   const outT=list.filter(f=>f.type==='out').reduce((s,f)=>s+f.value,0);
   return `
-  ${sub!=='geral'?`<div class="filters"><b>${sub==='pagar'?'Contas a pagar':'Contas a receber'}</b><button class="btn btn-sm" onclick="subMod={};go('fin','geral')">← Voltar à visão geral</button></div>`:''}
+  <div class="tabs">
+    <button class="tab ${sub==='geral'?'active':''}" onclick="subMod={};go('fin')">Tudo</button>
+    <button class="tab ${sub==='pagar'?'active':''}" onclick="subMod={pagar:true};go('fin')">A pagar</button>
+    <button class="tab ${sub==='receber'?'active':''}" onclick="subMod={receber:true};go('fin')">A receber</button>
+  </div>
   <div class="filters">
     <label>Período</label>
     <select id="finPeriod" onchange="render()">
@@ -503,7 +532,7 @@ function viewFin(){
     </select>
     <label>Status</label>
     <select id="finStatus" onchange="render()">
-      <option value="all">Todos</option><option value="pago">Pago</option><option value="pendente">Pendente</option><option value="vencido">Vencido</option>
+      <option value="all">Todos</option><option value="pago">Pago</option><option value="pendente">Pendente</option><option value="vencido">Vencido</option><option value="cancelado">Cancelado</option>
     </select>
     <label>Categoria</label>
     <select id="finCat" onchange="render()">
@@ -532,10 +561,10 @@ function finTable(list){
   <tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Venc.</th><th>Forma</th><th>Status</th><th class="num">Valor</th><th></th></tr>
   ${list.map(f=>{const st=effectiveStatus(f);return `<tr>
     <td>${brDate(f.date)}</td><td>${esc(f.desc)}</td><td>${esc(f.cat||'—')}</td><td>${brDate(f.due||f.date)}</td><td>${esc(f.method||'—')}</td>
-    <td><span class="tag ${st==='pago'?'tag-paid':st==='vencido'?'tag-over':'tag-pend'}">${st}</span></td>
+    <td><span class="tag ${st==='pago'?'tag-paid':st==='vencido'?'tag-over':st==='cancelado'?'':'tag-pend'}">${st==='vencido'?st+' ('+daysLate(f)+'d)':st}</span></td>
     <td class="num ${f.type==='in'?'pos':'neg'}">${f.type==='in'?'+ ':''}${money(f.value)}</td>
     <td class="num" style="white-space:nowrap">
-      ${st!=='pago'?`<button class="icon-btn" title="Marcar pago" onclick="payFin('${f.id}')">✔</button>`:''}
+      ${st==='pago'||st==='cancelado'?'':`<button class="icon-btn" title="Marcar pago" onclick="payFin('${f.id}')">✔</button>`}
       <button class="icon-btn" title="Excluir" onclick="delFin('${f.id}')">🗑</button>
     </td></tr>`}).join('')}
   </table></div>`;
@@ -548,7 +577,7 @@ function renderFinTable(){
   $('finTable').innerHTML=finTable(list);
 }
 function payFin(id){const f=co.data.fin.find(x=>x.id===id);if(f){f.status='pago';save();render();toast('Marcado como pago ✔')}}
-function delFin(id){if(confirm('Excluir lançamento?')){co.data.fin=co.data.fin.filter(x=>x.id!==id);save();render();toast('Excluído')}}
+function delFin(id){const f=co.data.fin.find(x=>x.id===id);if(f&&confirm('Cancelar este lançamento? (ele sai dos cálculos, mas fica no histórico)')){f.status='cancelado';save();render();toast('Lançamento cancelado')}}
 
 function openFinModal(){
   const cats=['Vendas','Delivery','Eventos','Fornecedores','Alimentos','Bebidas','Embalagens','Salário','Aluguel','Energia','Gás','Marketing','Impostos','Outros'];
@@ -584,10 +613,10 @@ function stockTab(tab){
   return viewStockProds();
 }
 function viewStock(){
-  const list=co.data.stock;
+  const list=co.data.stock.filter(p=>!p.inactive);
   const low=lowStockList();
   const stockValue=list.reduce((s,p)=>s+p.qty*p.cost,0);
-  const tab=subMod.mov?'mov':subMod.baixo?'baixo':'prods';
+  const tab=subMod.mov?'mov':subMod.baixo?'baixo':subMod.inativos?'prods':'prods';
   return `
   <div class="grid g4">
     ${kpi('Itens cadastrados',list.length,'')}
@@ -603,27 +632,44 @@ function viewStock(){
   ${stockTab(tab)}`;
 }
 function viewStockProds(){
-  const list=[...co.data.stock].sort((a,b)=>a.name.localeCompare(b.name));
+  const showInactive=subMod.inativos;
+  const list=[...co.data.stock].filter(p=>showInactive?p.inactive:!p.inactive).sort((a,b)=>a.name.localeCompare(b.name));
   return `
   <div class="card">
-    <div class="card-title"><h3>Produtos</h3><div style="display:flex;gap:8px"><button class="btn btn-sm" onclick="exportStock()">⬇ CSV</button><button class="btn btn-primary btn-sm" onclick="openStockModal()">+ Adicionar produto</button></div></div>
+    <div class="card-title"><h3>Produtos</h3><div style="display:flex;gap:8px">
+      <button class="btn btn-sm" onclick="go('stock',${showInactive?"'produtos'":"'inativos'"})">${showInactive?'← Ativos':'Inativos'}</button>
+      <button class="btn btn-sm" onclick="exportStock()">⬇ CSV</button>
+      <button class="btn btn-primary btn-sm" onclick="openStockModal()">+ Adicionar produto</button>
+    </div></div>
     <div class="tbl-wrap"><table>
-    <tr><th>Produto</th><th>Categoria</th><th>Unid.</th><th class="num">Estoque atual</th><th class="num">Mínimo</th><th class="num">Custo médio</th><th>Fornecedor</th><th>Status</th><th></th></tr>
-    ${list.length?list.map(p=>`<tr>
+    <tr><th>Produto</th><th>Categoria</th><th>Unid.</th><th class="num">Estoque atual</th><th class="num">Mínimo</th><th class="num">Último custo</th><th class="num">Custo médio</th><th class="num">Variação</th><th>Fornecedor</th><th>Status</th><th></th></tr>
+    ${list.length?list.map(p=>{
+      const lastC=p.lastCost??null;
+      const varPct=(lastC!==null&&p.cost>0)?((p.cost-lastC)/lastC*100):null;
+      return `<tr ${p.inactive?'style="opacity:.55"':''}>
       <td><b>${esc(p.name)}</b></td><td>${esc(p.cat||'—')}</td><td>${esc(p.unit)}</td>
       <td class="num"><b>${p.qty}</b></td><td class="num">${p.min}</td>
+      <td class="num">${lastC!==null?money(lastC):'—'}</td>
       <td class="num">${money(p.cost)}</td>
+      <td class="num ${varPct===null?'':varPct>0?'neg':varPct<0?'pos':''}">${varPct===null?'—':(varPct>=0?'+':'')+varPct.toFixed(1).replace('.',',')+'%'}</td>
       <td>${esc(supplierName(p.supplierId))}</td>
-      <td><span class="tag ${p.qty<=p.min?'tag-over':'tag-paid'}">${p.qty<=p.min?'Estoque baixo':'OK'}</span></td>
+      <td>${p.inactive?'<span class="tag">inativo</span>':`<span class="tag ${p.qty<=p.min?'tag-over':'tag-paid'}">${p.qty<=p.min?'Estoque baixo':'OK'}</span>`}</td>
       <td class="num" style="white-space:nowrap">
+        ${p.inactive?`<button class="icon-btn" title="Reativar" onclick="toggleStock('${p.id}')">↺</button>
+        <button class="icon-btn" title="Excluir" onclick="delStock('${p.id}')">🗑</button>`:`
         <button class="icon-btn" title="Entrada" onclick="moveStock('${p.id}','in')">＋</button>
         <button class="icon-btn" title="Saída" onclick="moveStock('${p.id}','out')">－</button>
         <button class="icon-btn" title="Perda" onclick="moveStock('${p.id}','loss')">⚠</button>
         <button class="icon-btn" title="Ajuste (definir saldo)" onclick="moveStock('${p.id}','adjust')">✎</button>
-        <button class="icon-btn" title="Excluir" onclick="delStock('${p.id}')">🗑</button>
-      </td></tr>`).join(''):'<tr><td colspan=9 class="empty">Nenhum produto cadastrado. Use “+ Adicionar produto”.</td></tr>'}
+        <button class="icon-btn" title="Inativar (mantém histórico)" onclick="toggleStock('${p.id}')">⏸</button>`}
+      </td></tr>`}).join(''):`<tr><td colspan=11 class="empty">${showInactive?'Nenhum produto inativo.':'Nenhum produto cadastrado. Use “+ Adicionar produto”.'}</td></tr>`}
     </table></div>
   </div>`;
+}
+function toggleStock(id){
+  const p=co.data.stock.find(x=>x.id===id); if(!p)return;
+  p.inactive=!p.inactive;
+  save();render();toast(p.inactive?'Produto inativado (histórico mantido)':'Produto reativado ✔');
 }
 function viewStockMoves(){
   const mv=[...co.data.moves].sort((a,b)=>b.date.localeCompare(a.date));
@@ -661,13 +707,19 @@ function moveStock(id,type){
   if(q===null)return;
   const n=parseFloat(q.replace(',','.'));
   if(isNaN(n)||n<0){toast('Quantidade inválida');return}
+  if(type==='in')p.lastCost=p.cost;
   if(type==='in')p.qty+=n;
   if(type==='out'||type==='loss'){if(n>p.qty){toast('Quantidade maior que o saldo');return}p.qty-=n}
   if(type==='adjust')p.qty=n;
   co.data.moves.unshift({id:uid(),stockId:p.id,type,date:todayISO(),qty:n,note:label,origin:'Manual'});
   save();render();toast(`${label} registrada ✔`);
 }
-function delStock(id){if(confirm('Excluir produto do estoque?')){co.data.stock=co.data.stock.filter(x=>x.id!==id);save();render();toast('Excluído')}}
+function delStock(id){
+  const p=co.data.stock.find(x=>x.id===id); if(!p)return;
+  const hasHist=co.data.moves.some(m=>m.stockId===id)||co.data.purch.some(pc=>pc.items.some(i=>i.stockId===id));
+  if(hasHist){toast('Este produto tem histórico — use INATIVAR (⏸) para preservar os registros');return}
+  if(confirm('Excluir produto do estoque?')){co.data.stock=co.data.stock.filter(x=>x.id!==id);save();render();toast('Excluído')}
+}
 function openStockModal(){
   modal('Produto de estoque',`
     <div class="row2">
@@ -682,7 +734,7 @@ function openStockModal(){
       <div><label>Estoque mínimo</label><input id="s_min" type="number" step="0.001" value="0"></div>
       <div><label>Custo médio (R$)</label><input id="s_cost" type="number" step="0.01" value="0"></div>
     </div>
-    <div class="mt"><label>Fornecedor principal</label><select id="s_supp"><option value="">—</option>${co.data.supp.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select></div>
+    <div class="mt"><label>Fornecedor principal</label><select id="s_supp"><option value="">—</option>${co.data.supp.filter(s=>!s.inactive).map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select></div>
   `,[
     {t:'Salvar produto',fn:()=>{
       const name=$('s_name').value.trim();
@@ -697,39 +749,67 @@ function openStockModal(){
 function viewPurch(){
   const list=[...co.data.purch].sort((a,b)=>b.date.localeCompare(a.date));
   const cur=todayISO().slice(0,7);
-  const month=list.filter(p=>p.date.slice(0,7)===cur).length;
-  const spend=list.reduce((s,p)=>s+p.total,0);
+  const month=list.filter(p=>p.date.slice(0,7)===cur&&!p.canceled).length;
+  const live=list.filter(p=>!p.canceled);
+  const spend=live.reduce((s,p)=>s+p.total,0);
   return `
   <div class="grid g4">
-    ${kpi('Compras registradas',list.length,'')}
+    ${kpi('Compras ativas',live.length,list.length-live.length+' cancelada(s)')}
     ${kpi('Total em compras',money(spend),'')}
     ${kpi('Compras no mês',month,'')}
-    ${kpi('Ticket médio',list.length?money(spend/list.length):money(0),'')}
+    ${kpi('Ticket médio',live.length?money(spend/live.length):money(0),'')}
   </div>
   <div class="card mt">
     <div class="card-title"><h3>Histórico de compras</h3><div style="display:flex;gap:8px"><button class="btn btn-sm" onclick="exportPurch()">⬇ CSV</button><button class="btn btn-primary btn-sm" onclick="openPurchModal()">+ Nova compra</button></div></div>
     <div class="tbl-wrap"><table>
     <tr><th>Data</th><th>Fornecedor</th><th class="num">Itens</th><th class="num">Valor total</th><th>Status</th><th></th></tr>
-    ${list.length?list.map(p=>`<tr>
+    ${list.length?list.map(p=>`<tr ${p.canceled?'style="opacity:.55"':''}>
       <td>${brDate(p.date)}</td><td>${esc(supplierName(p.supplierId))}</td>
       <td class="num"><b>${p.items.length}</b> ${p.items.length===1?'item':'itens'}</td>
       <td class="num"><b>${money(p.total)}</b></td>
-      <td><span class="tag ${p.finStatus==='pago'?'tag-paid':'tag-pend'}">${p.finStatus}</span></td>
-      <td class="num"><button class="icon-btn" title="Detalhes" onclick="purchDetail('${p.id}')">👁</button><button class="icon-btn" onclick="delPurch('${p.id}')">🗑</button></td>
+      <td>${p.canceled?'<span class="tag">cancelada</span>':`<span class="tag ${p.finStatus==='pago'?'tag-paid':'tag-pend'}">${p.finStatus}</span>`}</td>
+      <td class="num" style="white-space:nowrap">
+        <button class="icon-btn" title="Detalhes" onclick="purchDetail('${p.id}')">👁</button>
+        ${!p.canceled?`<button class="btn btn-sm" title="Cancelar e reverter estoque+financeiro" onclick="cancelPurch('${p.id}')">Cancelar</button>`:''}
+      </td>
     </tr>`).join(''):'<tr><td colspan=6 class="empty">Sem compras. Use “+ Nova compra”.</td></tr>'}
     </table></div>
   </div>`;
 }
-function delPurch(id){if(confirm('Excluir a compra? (estoque e financeiro NÃO são revertidos)')){co.data.purch=co.data.purch.filter(x=>x.id!==id);save();render();toast('Compra excluída')}}
 let purchItems=[];
+function cancelPurch(id){
+  const p=co.data.purch.find(x=>x.id===id); if(!p||p.canceled)return;
+  const rev=[];
+  for(const it of p.items){
+    const pr=co.data.stock.find(x=>x.id===it.stockId);
+    if(!pr)continue;
+    pr.qty=Math.max(0,+(pr.qty-it.qty).toFixed(3));
+    rev.push(`${pr.name}: -${it.qty}${pr.unit}`);
+  }
+  /* cancela o lançamento financeiro correspondente (criado junto) */
+  const fin=co.data.fin.find(f=>f.desc==='Compra — '+supplierName(p.supplierId)&&f.value===p.total&&f.status!=='cancelado');
+  if(fin)fin.status='cancelado';
+  p.canceled=true;
+  p.canceledAt=todayISO();
+  save();render();
+  modal('Compra cancelada',`
+    <p>A compra foi cancelada e <b>revertida</b>:</p>
+    <div class="tbl-wrap mt"><table>
+    <tr><th>Reversão no estoque</th></tr>
+    ${rev.map(r=>`<tr><td>${esc(r)}</td></tr>`).join('')}
+    </table></div>
+    ${fin?'<p class="small muted mt">O lançamento financeiro correspondente também foi cancelado (sai dos cálculos, fica no histórico).</p>':'<p class="small muted mt">Nenhum lançamento financeiro vinculado encontrado.</p>'}
+  `,[]);
+  toast('Compra cancelada com reversão ✔');
+}
 function purchDetail(id){
   const p=co.data.purch.find(x=>x.id===id); if(!p)return;
   modal('Compra — '+supplierName(p.supplierId),`
-    <p class="muted small">Data: ${brDate(p.date)} · Status: ${p.finStatus}${p.note?' · Obs: '+esc(p.note):''}</p>
+    <p class="muted small">Data: ${brDate(p.date)} · Status: ${p.canceled?'CANCELADA em '+brDate(p.canceledAt||''):p.finStatus}${p.note?' · Obs: '+esc(p.note):''}</p>
     <div class="tbl-wrap mt"><table>
-    <tr><th>Produto</th><th class="num">Qtd</th><th class="num">Preço un.</th><th class="num">Subtotal</th></tr>
-    ${p.items.map(it=>{const pr=co.data.stock.find(x=>x.id===it.stockId);return `<tr><td>${esc(pr?pr.name:'—')}</td><td class="num">${it.qty}</td><td class="num">${money(it.price)}</td><td class="num">${money(it.qty*it.price)}</td></tr>`}).join('')}
-    <tr><td colspan="3" style="text-align:right"><b>Total</b></td><td class="num"><b>${money(p.total)}</b></td></tr>
+    <tr><th>Produto</th><th class="num">Qtd</th><th class="num">Preço un.</th><th class="num">Subtotal</th><th class="num">Custo médio antes → depois</th></tr>
+    ${p.items.map(it=>{const pr=co.data.stock.find(x=>x.id===it.stockId);const pc=p.costBefore&&p.costBefore[it.stockId]!==undefined?p.costBefore[it.stockId]:null;return `<tr><td>${esc(pr?pr.name:'—')}</td><td class="num">${it.qty}</td><td class="num">${money(it.price)}</td><td class="num">${money(it.qty*it.price)}</td><td class="num">${pc!==null?money(pc)+' → '+money(pr?pr.cost:0):'—'}</td></tr>`}).join('')}
+    <tr><td colspan="3" style="text-align:right"><b>Total</b></td><td class="num"><b>${money(p.total)}</b></td><td></td></tr>
     </table></div>
   `,[]);
 }
@@ -739,7 +819,7 @@ function openPurchModal(supplierId){
   purchItems=[{stockId:co.data.stock[0].id,qty:1,price:co.data.stock[0].cost}];
   modal('Nova compra',`
     <div class="row2">
-      <div><label>Fornecedor</label><select id="p_supp">${co.data.supp.map(s=>`<option value="${s.id}" ${s.id===supplierId?'selected':''}>${esc(s.name)}</option>`).join('')}</select></div>
+      <div><label>Fornecedor</label><select id="p_supp">${co.data.supp.filter(s=>!s.inactive).map(s=>`<option value="${s.id}" ${s.id===supplierId?'selected':''}>${esc(s.name)}</option>`).join('')}</select></div>
       <div><label>Data</label><input id="p_date" type="date" value="${todayISO()}"></div>
     </div>
     <div class="mt"><label>Itens da compra</label><div id="p_items"></div>
@@ -753,20 +833,22 @@ function openPurchModal(supplierId){
   `,[
     {t:'Registrar compra',fn:()=>{
       if(!purchItems.length){toast('Adicione produtos');return}
-      let total=0;const its=[];
+      let total=0;const its=[];const costBefore={};
       for(const it of purchItems){
         const pr=co.data.stock.find(x=>x.id===it.stockId);
         if(!pr||it.qty<=0)continue;
+        costBefore[pr.id]=pr.cost;
         const sub=it.qty*it.price; total+=sub;
         /* custo médio ponderado */
         const oq=pr.qty, oc=pr.cost;
+        pr.lastCost=oc;
         pr.qty+=it.qty;
         pr.cost=(oq+it.qty)>0?((oq*oc+it.qty*it.price)/(oq+it.qty)):it.price;
         its.push({stockId:pr.id,qty:it.qty,price:it.price});
         co.data.moves.unshift({id:uid(),stockId:pr.id,type:'in',date:todayISO(),qty:it.qty,note:'Compra',origin:'Compra'});
       }
       if(!its.length){toast('Nenhum item válido');return}
-      co.data.purch.push({id:uid(),supplierId:$('p_supp').value,date:$('p_date').value||todayISO(),items:its,total,method:$('p_method').value,finStatus:$('p_finStatus').value,note:$('p_note').value.trim()});
+      co.data.purch.push({id:uid(),supplierId:$('p_supp').value,date:$('p_date').value||todayISO(),items:its,total,method:$('p_method').value,finStatus:$('p_finStatus').value,note:$('p_note').value.trim(),costBefore});
       co.data.fin.push({id:uid(),type:'out',value:total,desc:'Compra — '+supplierName($('p_supp').value),cat:'Fornecedores',method:$('p_method').value,date:$('p_date').value||todayISO(),due:$('p_date').value||todayISO(),status:$('p_finStatus').value});
       save();render();toast('Compra registrada: estoque e financeiro atualizados ✔');
     }}
@@ -792,30 +874,34 @@ function addPurchItem(){purchItems.push({stockId:co.data.stock[0].id,qty:1,price
 
 /* ---------- FORNECEDORES ---------- */
 function viewSupp(){
-  const list=[...co.data.supp].sort((a,b)=>a.name.localeCompare(b.name));
+  const showInactive=subMod.inativos;
+  const list=[...co.data.supp].filter(s=>showInactive?s.inactive:!s.inactive).sort((a,b)=>a.name.localeCompare(b.name));
   return `
   <div class="grid g4">
-    ${kpi('Fornecedores',list.length,'')}
+    ${kpi('Fornecedores ativos',list.length,showInactive?'vendo inativos':'')}
     ${kpi('Com compras',list.filter(s=>co.data.purch.some(p=>p.supplierId===s.id)).length,'')}
     ${kpi('Com WhatsApp',list.filter(s=>s.whats).length,'')}
     ${kpi('Com e-mail',list.filter(s=>s.email).length,'')}
   </div>
   <div class="card mt">
-    <div class="card-title"><h3>Fornecedores</h3><button class="btn btn-primary btn-sm" onclick="openSuppModal()">+ Fornecedor</button></div>
+    <div class="card-title"><h3>Fornecedores</h3><div style="display:flex;gap:8px">
+      <button class="btn btn-sm" onclick="go('supp',${showInactive?"'produtos'":"'inativos'"})">${showInactive?'← Ativos':'Inativos'}</button>
+      <button class="btn btn-primary btn-sm" onclick="openSuppModal()">+ Fornecedor</button>
+    </div></div>
     <div class="tbl-wrap"><table>
     <tr><th>Nome</th><th>CPF/CNPJ</th><th>Telefone</th><th>WhatsApp</th><th>E-mail</th><th class="num">Última compra</th><th class="num">Total comprado</th><th></th></tr>
     ${list.length?list.map(s=>{const ps=co.data.purch.filter(p=>p.supplierId===s.id);const tot=ps.reduce((x,p)=>x+p.total,0);const last=ps.map(p=>p.date).sort().pop();
-    return `<tr>
+    return `<tr ${s.inactive?'style="opacity:.55"':''}>
       <td><b>${esc(s.name)}</b></td><td>${esc(s.doc||'—')}</td><td>${esc(s.phone||'—')}</td>
       <td>${s.whats?`<a href="https://wa.me/55${esc(s.whats.replace(/\D/g,''))}" target="_blank" style="color:var(--green)">${esc(s.whats)}</a>`:'—'}</td>
       <td>${esc(s.email||'—')}</td>
       <td class="num">${last?brDate(last):'—'}</td>
       <td class="num"><b>${money(tot)}</b></td>
       <td class="num" style="white-space:nowrap">
-        <button class="btn btn-sm btn-primary" onclick="openPurchModal('${s.id}')">Nova compra</button>
+        ${s.inactive?`<button class="btn btn-sm btn-primary" onclick="toggleSupp('${s.id}')">Reativar</button>`:`<button class="btn btn-sm btn-primary" onclick="openPurchModal('${s.id}')">Nova compra</button>
         <button class="icon-btn" onclick="openSuppModal('${s.id}')">✎</button>
-        <button class="icon-btn" onclick="delSupp('${s.id}')">🗑</button>
-      </td></tr>`}).join(''):'<tr><td colspan=8 class="empty">Nenhum fornecedor. Use “+ Fornecedor”.</td></tr>'}
+        <button class="icon-btn" title="Inativar (mantém histórico)" onclick="toggleSupp('${s.id}')">⏸</button>`}
+      </td></tr>`}).join(''):`<tr><td colspan=8 class="empty">${showInactive?'Nenhum fornecedor inativo.':'Nenhum fornecedor. Use “+ Fornecedor”.'}</td></tr>`}
     </table></div>
   </div>
   <div class="card mt">
@@ -851,7 +937,16 @@ function openSuppModal(id){
     }}
   ]);
 }
-function delSupp(id){if(confirm('Excluir fornecedor?')){co.data.supp=co.data.supp.filter(x=>x.id!==id);save();render();toast('Excluído')}}
+function toggleSupp(id){
+  const s=co.data.supp.find(x=>x.id===id); if(!s)return;
+  s.inactive=!s.inactive;
+  save();render();toast(s.inactive?'Fornecedor inativado (histórico mantido)':'Fornecedor reativado ✔');
+}
+function delSupp(id){
+  const s=co.data.supp.find(x=>x.id===id); if(!s)return;
+  if(co.data.purch.some(p=>p.supplierId===id)){toast('Este fornecedor tem compras no histórico — use INATIVAR (⏸)');return}
+  if(confirm('Excluir fornecedor?')){co.data.supp=co.data.supp.filter(x=>x.id!==id);save();render();toast('Excluído')}
+}
 
 /* ---------- PRODUTOS & PRATOS ---------- */
 function dishCost(d){return (d.ingredients||[]).reduce((s,i)=>{const p=co.data.stock.find(x=>x.id===i.stockId);return s+(p?p.cost*i.qty:0)},0)}
@@ -927,8 +1022,8 @@ function fichaTab(dishes){
   <div class="card" style="margin-bottom:14px">
     <div class="card-title"><h3>📋 ${esc(d.name)}</h3><span class="tag ${mg>=40?'tag-paid':mg>0?'tag-pend':'tag-over'}">Margem ${pct(mg)}</span></div>
     <div class="tbl-wrap"><table>
-    <tr><th>Ingrediente</th><th class="num">Quantidade</th><th class="num">Custo</th></tr>
-    ${(d.ingredients||[]).map(i=>{const p=co.data.stock.find(x=>x.id===i.stockId);return `<tr><td>${esc(p?p.name:'—')}</td><td class="num">${i.qty} ${p?p.unit:''}</td><td class="num">${money(p?p.cost*i.qty:0)}</td></tr>`}).join('')}
+    <tr><th>Ingrediente</th><th class="num">Quantidade</th><th class="num">Custo unitário</th><th class="num">Custo total</th></tr>
+    ${(d.ingredients||[]).map(i=>{const p=co.data.stock.find(x=>x.id===i.stockId);return `<tr><td>${esc(p?p.name:'—')}</td><td class="num">${i.qty} ${p?p.unit:''}</td><td class="num">${p?money(p.cost):'—'}</td><td class="num">${money(p?p.cost*i.qty:0)}</td></tr>`}).join('')}
     </table></div>
     <div class="ficha-total">
       <div class="row"><span>Custo total dos ingredientes</span><b>${money(cost)}</b></div>
@@ -1039,7 +1134,7 @@ function viewReports(){
 function openReport(id){
   const area=$('repArea');
   if(id==='fin'){
-    const fin=co.data.fin;
+    const fin=liveFin();
     const inT=fin.filter(f=>f.type==='in').reduce((s,f)=>s+f.value,0);
     const outT=fin.filter(f=>f.type==='out').reduce((s,f)=>s+f.value,0);
     const cats={};
