@@ -27,13 +27,13 @@ h3{font-size:15px}
 #login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(1200px 600px at 70% 20%,rgba(232,89,12,.10),transparent),var(--bg);z-index:50}
 .login-card{width:380px;max-width:92vw;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:32px 28px}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px}
-.logo-badge{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--orange),#ca4a0a);display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-badge{width:34px;height:34px;border-radius:9px;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:18px}
 .login-card h1{font-size:19px;margin:18px 0 2px}
 .login-card .sub{color:var(--mut);font-size:13px;margin-bottom:18px}
 .login-card label{margin-top:12px}
 .btn{border:none;border-radius:9px;padding:10px 16px;font-weight:700;font-size:14px;background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
-.btn-primary{background:linear-gradient(135deg,var(--orange),#ca4a0a);border:none;color:#fff}
-.btn:hover{filter:brightness(1.12)}
+.btn-primary{background:var(--orange);border:none;color:#fff}
+.btn:hover{filter:brightness(1.06)}
 .btn-sm{padding:6px 10px;font-size:12.5px;border-radius:7px}
 .btn-block{width:100%;margin-top:16px}
 .err{color:#fca5a5;font-size:13px;margin-top:10px;min-height:16px}
@@ -44,7 +44,7 @@ h3{font-size:15px}
 .side-nav{flex:1;padding:10px 8px;overflow-y:auto}
 .nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:9px;color:var(--mut);font-weight:600;cursor:pointer;margin-bottom:2px}
 .nav-item:hover{background:var(--panel2);color:var(--txt)}
-.nav-item.active{background:linear-gradient(135deg,rgba(232,89,12,.14),rgba(232,89,12,.06));color:var(--orange2);border:1px solid rgba(232,89,12,.30)}
+.nav-item.active{background:rgba(232,89,12,.10);color:var(--orange2);border:1px solid rgba(232,89,12,.25)}
 .nav-item .ic{width:20px;text-align:center}
 .nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10.5px;font-weight:700;border-radius:99px;padding:1px 7px}
 .side-foot{padding:14px 16px;border-top:1px solid var(--line);font-size:12.5px}
@@ -58,7 +58,7 @@ h3{font-size:15px}
 .grid{display:grid;gap:14px}
 .g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
 .g2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 1px 3px rgba(61,44,30,.05)}
 .kpi-label{font-size:12px;color:var(--mut);font-weight:600;margin-bottom:6px}
 .kpi-value{font-size:22px;font-weight:800}
 .kpi-sub{font-size:12px;margin-top:4px}
@@ -99,6 +99,32 @@ td.num,th.num{text-align:right}
 
 #toast{position:fixed;bottom:22px;right:22px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--green);padding:12px 18px;border-radius:10px;font-size:13.5px;z-index:60;display:none;box-shadow:0 8px 30px rgba(61,44,30,.25)}
 
+/* --- v1.1: tabs, submenu, filtros, ficha técnica --- */
+.nav-group{margin-bottom:2px}
+.nav-group>.nav-item.has-sub{position:relative}
+.nav-sub{display:none;padding:2px 0 6px 30px}
+.nav-group.open .nav-sub{display:block}
+.nav-sub .nav-item{padding:7px 10px;font-size:13px;font-weight:600;margin-bottom:1px}
+.nav-group.open>.nav-item{color:var(--txt)}
+.tabs{display:flex;gap:6px;border-bottom:2px solid var(--line);margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:9px 16px;font-weight:700;font-size:13.5px;color:var(--mut);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px}
+.tab:hover{color:var(--txt)}
+.tab.active{color:var(--orange2);border-bottom-color:var(--orange)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:14px}
+.filters label{margin:0 4px 0 8px;font-size:11.5px}
+.filters label:first-child{margin-left:0}
+.filters select,.filters input{width:auto;min-width:130px;padding:7px 9px;font-size:13px}
+.ficha-row{display:grid;grid-template-columns:1fr 110px 110px 40px;gap:8px;align-items:end;margin-bottom:8px}
+.ficha-total{background:var(--panel2);border-radius:10px;padding:12px 14px;margin-top:10px}
+.ficha-total .row{display:flex;justify-content:space-between;padding:4px 0;font-size:14px}
+.ficha-total .row b{font-size:15px}
+.rep-card{cursor:pointer}
+.rep-card:hover{border-color:var(--orange)}
+@media(max-width:900px){
+  .ficha-row{grid-template-columns:1fr 90px 90px 40px}
+  .filters select,.filters input{min-width:110px;flex:1}
+}
+
 @media(max-width:900px){
   .sidebar{transform:translateX(-100%);transition:.25s}
   .sidebar.open{transform:none;box-shadow:0 0 60px rgba(61,44,30,.3)}
@@ -125,7 +151,7 @@ td.num,th.num{text-align:right}
     </div>
     <label>Senha</label>
     <input id="loginPass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-    <div id="loginHint" class="small muted mt" style="display:none">Primeiro acesso: defina uma senha e ela fica vinculada a esta empresa neste navegador.</div>
+    <div id="loginHint" class="small muted mt" style="display:none">Primeiro acesso: crie o nome da sua empresa e uma senha. Fica salvo neste navegador (versão de teste — depois será migrado para acesso na nuvem).</div>
     <div class="err" id="loginErr"></div>
     <button class="btn btn-primary btn-block" onclick="doLogin()">Entrar</button>
     <p class="small muted mt" id="toggleMode" style="text-align:center;cursor:pointer"></p>
@@ -141,11 +167,39 @@ td.num,th.num{text-align:right}
     </div>
     <nav class="side-nav" id="nav">
       <div class="nav-item active" data-mod="dash" onclick="go('dash')"><span class="ic">📈</span> Dashboard</div>
-      <div class="nav-item" data-mod="fin" onclick="go('fin')"><span class="ic">💰</span> Financeiro <span class="nav-badge" id="finBadge" style="display:none">0</span></div>
-      <div class="nav-item" data-mod="stock" onclick="go('stock')"><span class="ic">📦</span> Estoque <span class="nav-badge" id="stockBadge" style="display:none">0</span></div>
-      <div class="nav-item" data-mod="purch" onclick="go('purch')"><span class="ic">🛒</span> Compras</div>
+      <div class="nav-group" id="grp-fin">
+        <div class="nav-item has-sub" onclick="toggleGroup('grp-fin');go('fin')"><span class="ic">💰</span> Financeiro <span class="nav-badge" id="finBadge" style="display:none">0</span></div>
+        <div class="nav-sub">
+          <div class="nav-item" data-mod="fin" onclick="go('fin','geral')">Visão geral</div>
+          <div class="nav-item" data-mod="fin" onclick="go('fin','pagar')">Contas a pagar</div>
+          <div class="nav-item" data-mod="fin" onclick="go('fin','receber')">Contas a receber</div>
+        </div>
+      </div>
+      <div class="nav-group" id="grp-stock">
+        <div class="nav-item has-sub" onclick="toggleGroup('grp-stock');go('stock')"><span class="ic">📦</span> Estoque <span class="nav-badge" id="stockBadge" style="display:none">0</span></div>
+        <div class="nav-sub">
+          <div class="nav-item" data-mod="stock" onclick="go('stock','produtos')">Produtos</div>
+          <div class="nav-item" data-mod="stock" onclick="go('stock','mov')">Movimentações</div>
+          <div class="nav-item" data-mod="stock" onclick="go('stock','baixo')">Estoque baixo</div>
+        </div>
+      </div>
+      <div class="nav-group" id="grp-purch">
+        <div class="nav-item has-sub" onclick="toggleGroup('grp-purch');go('purch')"><span class="ic">🛒</span> Compras</div>
+        <div class="nav-sub">
+          <div class="nav-item" onclick="openPurchModal()">Nova compra</div>
+          <div class="nav-item" data-mod="purch" onclick="go('purch')">Histórico</div>
+        </div>
+      </div>
       <div class="nav-item" data-mod="supp" onclick="go('supp')"><span class="ic">🚚</span> Fornecedores</div>
-      <div class="nav-item" data-mod="prods" onclick="go('prods')"><span class="ic">🍽️</span> Produtos e Pratos</div>
+      <div class="nav-group" id="grp-prods">
+        <div class="nav-item has-sub" onclick="toggleGroup('grp-prods');go('prods')"><span class="ic">🍽️</span> Produtos e Pratos</div>
+        <div class="nav-sub">
+          <div class="nav-item" data-mod="prods" onclick="go('prods','produtos')">Produtos</div>
+          <div class="nav-item" data-mod="prods" onclick="go('prods','pratos')">Pratos</div>
+          <div class="nav-item" data-mod="prods" onclick="go('prods','ficha')">Ficha técnica</div>
+        </div>
+      </div>
+      <div class="nav-item" data-mod="reports" onclick="go('reports')"><span class="ic">📄</span> Relatórios</div>
       <div class="nav-item" data-mod="settings" onclick="go('settings')"><span class="ic">⚙️</span> Configurações</div>
     </nav>
     <div class="side-foot">
@@ -170,18 +224,19 @@ td.num,th.num{text-align:right}
 
 <script>
 /* ============================================================
-   GestorPro MVP — arquivo único
+   GestorPro MVP v1.1 — arquivo único
    Dados por empresa (multiempresa) em localStorage.
    Camada DB isolada: pronta para trocar por Supabase depois.
    ============================================================ */
 
 const MODULES = {
-  dash:   {title:'Dashboard',        ctx:'+ Lançamento'},
-  fin:    {title:'Financeiro',       ctx:'+ Lançamento'},
-  stock:  {title:'Estoque',          ctx:'+ Produto'},
+  dash:   {title:'Dashboard',        ctx:''},
+  fin:    {title:'Financeiro',       ctx:'+ Adicionar lançamento'},
+  stock:  {title:'Estoque',          ctx:'+ Adicionar produto'},
   purch:  {title:'Compras',          ctx:'+ Nova compra'},
   supp:   {title:'Fornecedores',     ctx:'+ Fornecedor'},
-  prods:  {title:'Produtos e Pratos',ctx:'+ Produto/Prato'},
+  prods:  {title:'Produtos e Pratos',ctx:'+ Adicionar produto/prato'},
+  reports:{title:'Relatórios',       ctx:''},
   settings:{title:'Configurações',   ctx:''}
 };
 
@@ -256,15 +311,25 @@ function enter(id){
 function logout(){ db.session=null;DB.write(db); $('app').style.display='none';$('login').style.display='flex';renderLogin();$('loginPass').value=''; }
 
 /* ---------- NAV ---------- */
-function go(m){
+function toggleGroup(id){
+  const g=$(id);
+  const was=g.classList.contains('open');
+  document.querySelectorAll('.nav-group').forEach(x=>x.classList.remove('open'));
+  if(!was)g.classList.add('open');
+}
+function go(m,sub){
   mod=m;
+  if(sub)subMod[sub]=true;
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.mod===m));
+  const g={fin:'grp-fin',stock:'grp-stock',purch:'grp-purch',prods:'grp-prods'}[m];
+  if(g)$(g).classList.add('open');
   $('pageTitle').textContent=MODULES[m].title;
   $('ctxBtn').style.display=MODULES[m].ctx?'':'none';
   $('ctxBtn').textContent=MODULES[m].ctx;
   $('sidebar').classList.remove('open');
   render();
 }
+let subMod={};
 function ctxAction(){
   if(mod==='stock')openStockModal();
   else if(mod==='purch')openPurchModal();
@@ -276,6 +341,8 @@ function ctxAction(){
 /* ---------- RENDER ---------- */
 function render(){
   if(!co)return;
+  const keep={};
+  ['finPeriod','finFrom','finTo','finType','finStatus','finCat','finSearch'].forEach(id=>{const el=$(id);if(el)keep[id]=el.value});
   updateBadges();
   const v=$('view');
   if(mod==='dash')v.innerHTML=viewDash();
@@ -284,7 +351,10 @@ function render(){
   else if(mod==='purch')v.innerHTML=viewPurch();
   else if(mod==='supp')v.innerHTML=viewSupp();
   else if(mod==='prods')v.innerHTML=viewProds();
+  else if(mod==='reports')v.innerHTML=viewReports();
   else if(mod==='settings')v.innerHTML=viewSettings();
+  Object.entries(keep).forEach(([id,val])=>{const el=$(id);if(el)el.value=val});
+  if(keep.finPeriod==='custom'){const c=$('finCustom');if(c)c.style.display='inline'}
   v.scrollTop=0;
 }
 function updateBadges(){
@@ -339,12 +409,22 @@ function viewDash(){
   const outS=months.map(m=>fin.filter(f=>f.type==='out'&&f.date.slice(0,7)===m.key).reduce((s,f)=>s+f.value,0));
   const max=Math.max(...inS,...outS,1);
   const bars=months.map((m,i)=>`<div class="bar-g"><div class="bars"><div class="b in" style="height:${Math.max(2,inS[i]/max*130)}px" title="Receitas: ${money(inS[i])}"></div><div class="b out" style="height:${Math.max(2,outS[i]/max*130)}px" title="Despesas: ${money(outS[i])}"></div></div><div class="lb">${m.label}</div></div>`).join('');
+  const margem=inM>0?((result/inM)*100).toFixed(1).replace('.',',')+'%':'—';
+  const stockValue=co.data.stock.reduce((s,p)=>s+p.qty*p.cost,0);
+  const purchMonth=co.data.purch.filter(p=>p.date.slice(0,7)===cur);
+  const receivable=fin.filter(f=>f.type==='in'&&effectiveStatus(f)!=='pago').reduce((s,f)=>s+f.value,0);
   return `
   <div class="grid g4">
-    ${kpi('Faturamento (mês)',money(inM),'entradas registradas','pos')}
-    ${kpi('Despesas (mês)',money(outM),'saídas registradas','neg')}
-    ${kpi('Resultado estimado',money(result),result>=0?'positivo no mês':'negativo no mês',result>=0?'pos':'neg')}
-    ${kpi('Contas pendentes',money(pendTotal),pend.length+' lançamento(s)','warn')}
+    ${kpi('Faturamento',money(inM),'entradas do mês','pos')}
+    ${kpi('Despesas',money(outM),'saídas do mês','neg')}
+    ${kpi('Resultado do mês',money(result),result>=0?'positivo':'negativo',result>=0?'pos':'neg')}
+    ${kpi('Margem estimada',margem,'faturamento - despesas',inM>0?(result>=0?'pos':'neg'):'')}
+  </div>
+  <div class="grid g4 mt">
+    ${kpi('Valor do estoque',money(stockValue),low.length+' produto(s) abaixo do mínimo',low.length?'warn':'pos')}
+    ${kpi('Compras do mês',money(purchMonth.reduce((s,p)=>s+p.total,0)),purchMonth.length+' compra(s)')}
+    ${kpi('Contas pendentes',money(pendTotal),pend.length+' a pagar/receber','warn')}
+    ${kpi('A receber',money(receivable),'entradas ainda não pagas','pos')}
   </div>
   <div class="grid g2 mt">
     <div class="card">
@@ -376,31 +456,74 @@ function viewDash(){
 }
 
 /* ---------- FINANCEIRO ---------- */
+function finPeriodRange(){
+  const p=$('finPeriod')?$('finPeriod').value:'month';
+  const now=new Date();
+  const y=now.getFullYear(), m=now.getMonth();
+  if(p==='month')return [new Date(y,m,1).toISOString().slice(0,10), new Date(y,m+1,0).toISOString().slice(0,10)];
+  if(p==='lastmonth'){const d=new Date(y,m-1,1);return [d.toISOString().slice(0,10), new Date(y,m,0).toISOString().slice(0,10)]}
+  if(p==='d30'){const d=new Date(now);d.setDate(d.getDate()-30);return [d.toISOString().slice(0,10), todayISO()]}
+  if(p==='custom')return [$('finFrom').value||'0000-01-01', $('finTo').value||'9999-12-31'];
+  return ['0000-01-01','9999-12-31'];
+}
+function filteredFin(){
+  let list=[...co.data.fin];
+  const [a,b]=finPeriodRange();
+  list=list.filter(f=>f.date>=a&&f.date<=b);
+  const t=$('finType')?$('finType').value:'all';
+  if(t!=='all')list=list.filter(x=>x.type===t);
+  const s=$('finStatus')?$('finStatus').value:'all';
+  if(s!=='all')list=list.filter(x=>effectiveStatus(x)===s);
+  const c=$('finCat')?$('finCat').value:'all';
+  if(c!=='all')list=list.filter(x=>(x.cat||'')===c);
+  const q=$('finSearch')?($('finSearch').value||'').toLowerCase():'';
+  if(q)list=list.filter(x=>(x.desc+' '+(x.cat||'')).toLowerCase().includes(q));
+  return list.sort((x,y)=>y.date.localeCompare(x.date));
+}
 function viewFin(){
-  const list=[...co.data.fin].sort((a,b)=>b.date.localeCompare(a.date));
+  const cats=[...new Set(co.data.fin.map(f=>f.cat).filter(Boolean))];
+  const sub=subMod.pagar?'pagar':subMod.receber?'receber':'geral';
+  const list=filteredFin();
   const inT=list.filter(f=>f.type==='in').reduce((s,f)=>s+f.value,0);
   const outT=list.filter(f=>f.type==='out').reduce((s,f)=>s+f.value,0);
-  const saldo=inT-outT;
-  const pend=activeFin();
   return `
+  ${sub!=='geral'?`<div class="filters"><b>${sub==='pagar'?'Contas a pagar':'Contas a receber'}</b><button class="btn btn-sm" onclick="subMod={};go('fin','geral')">← Voltar à visão geral</button></div>`:''}
+  <div class="filters">
+    <label>Período</label>
+    <select id="finPeriod" onchange="render()">
+      <option value="month">Este mês</option><option value="lastmonth">Mês anterior</option>
+      <option value="d30">Últimos 30 dias</option><option value="all">Tudo</option><option value="custom">Personalizado</option>
+    </select>
+    <span id="finCustom" style="display:none">
+      <input id="finFrom" type="date" onchange="render()"> <input id="finTo" type="date" onchange="render()">
+    </span>
+    <label>Tipo</label>
+    <select id="finType" onchange="render()">
+      <option value="all">Todos</option><option value="in">Entradas</option><option value="out">Saídas</option>
+    </select>
+    <label>Status</label>
+    <select id="finStatus" onchange="render()">
+      <option value="all">Todos</option><option value="pago">Pago</option><option value="pendente">Pendente</option><option value="vencido">Vencido</option>
+    </select>
+    <label>Categoria</label>
+    <select id="finCat" onchange="render()">
+      <option value="all">Todas</option>${cats.map(c=>`<option>${esc(c)}</option>`).join('')}
+    </select>
+  </div>
   <div class="grid g4">
-    ${kpi('Entradas (total)',money(inT),'','pos')}
-    ${kpi('Saídas (total)',money(outT),'','neg')}
-    ${kpi('Saldo',money(saldo),saldo>=0?'positivo':'negativo',saldo>=0?'pos':'neg')}
-    ${kpi('Pendentes',money(pend.reduce((s,f)=>s+f.value,0)),pend.filter(f=>effectiveStatus(f)==='vencido').length+' vencida(s)','warn')}
+    ${kpi('Receitas',money(inT),'no período','pos')}
+    ${kpi('Despesas',money(outT),'no período','neg')}
+    ${kpi('Resultado',money(inT-outT),inT-outT>=0?'positivo':'negativo',inT-outT>=0?'pos':'neg')}
+    ${kpi('Lançamentos',list.length,'no período')}
   </div>
   <div class="card mt">
     <div class="card-title"><h3>Histórico</h3>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <input id="finSearch" placeholder="Buscar..." style="width:200px" oninput="renderFinTable()">
-        <select id="finFilter" onchange="renderFinTable()">
-          <option value="all">Todos</option><option value="in">Entradas</option><option value="out">Despesas</option>
-          <option value="pago">Pagos</option><option value="pendente">Pendentes</option><option value="vencido">Vencidos</option>
-        </select>
         <button class="btn btn-sm" onclick="exportFin()">⬇ CSV</button>
       </div>
     </div>
-    <div id="finTable">${finTable(list)}</div>
+    <div id="finTable">${finTable(sub==='pagar'?list.filter(f=>f.type==='out'):sub==='receber'?list.filter(f=>f.type==='in'):list)}</div>
   </div>`;
 }
 function finTable(list){
@@ -418,13 +541,10 @@ function finTable(list){
   </table></div>`;
 }
 function renderFinTable(){
-  const q=($('finSearch')?.value||'').toLowerCase();
-  const f=$('finFilter')?.value||'all';
-  let list=[...co.data.fin].sort((a,b)=>b.date.localeCompare(a.date));
-  if(f==='in')list=list.filter(x=>x.type==='in');
-  else if(f==='out')list=list.filter(x=>x.type==='out');
-  else if(f!=='all')list=list.filter(x=>effectiveStatus(x)===f);
-  if(q)list=list.filter(x=>(x.desc+' '+(x.cat||'')).toLowerCase().includes(q));
+  let list=filteredFin();
+  const sub=subMod.pagar?'pagar':subMod.receber?'receber':'geral';
+  if(sub==='pagar')list=list.filter(f=>f.type==='out');
+  if(sub==='receber')list=list.filter(f=>f.type==='in');
   $('finTable').innerHTML=finTable(list);
 }
 function payFin(id){const f=co.data.fin.find(x=>x.id===id);if(f){f.status='pago';save();render();toast('Marcado como pago ✔')}}
@@ -458,10 +578,16 @@ function openFinModal(){
 }
 
 /* ---------- ESTOQUE ---------- */
+function stockTab(tab){
+  if(tab==='mov')return viewStockMoves();
+  if(tab==='baixo')return viewStockLow();
+  return viewStockProds();
+}
 function viewStock(){
-  const list=[...co.data.stock].sort((a,b)=>a.name.localeCompare(b.name));
+  const list=co.data.stock;
   const low=lowStockList();
   const stockValue=list.reduce((s,p)=>s+p.qty*p.cost,0);
+  const tab=subMod.mov?'mov':subMod.baixo?'baixo':'prods';
   return `
   <div class="grid g4">
     ${kpi('Itens cadastrados',list.length,'')}
@@ -469,29 +595,62 @@ function viewStock(){
     ${kpi('Alertas de mínimo',low.length,low.length?'repor urgente':'tudo em dia',low.length?'neg':'pos')}
     ${kpi('Movimentações',co.data.moves.length,'entradas, saídas, perdas e ajustes')}
   </div>
-  <div class="card mt">
-    <div class="card-title"><h3>Produtos em estoque</h3><div style="display:flex;gap:8px"><button class="btn btn-sm" onclick="exportStock()">⬇ CSV</button><button class="btn btn-primary btn-sm" onclick="openStockModal()">+ Produto</button></div></div>
+  <div class="tabs mt">
+    <button class="tab ${tab==='prods'?'active':''}" onclick="go('stock','produtos')">Produtos</button>
+    <button class="tab ${tab==='mov'?'active':''}" onclick="go('stock','mov')">Movimentações</button>
+    <button class="tab ${tab==='baixo'?'active':''}" onclick="go('stock','baixo')">Estoque baixo ${low.length?`<span class="tag tag-over">${low.length}</span>`:''}</button>
+  </div>
+  ${stockTab(tab)}`;
+}
+function viewStockProds(){
+  const list=[...co.data.stock].sort((a,b)=>a.name.localeCompare(b.name));
+  return `
+  <div class="card">
+    <div class="card-title"><h3>Produtos</h3><div style="display:flex;gap:8px"><button class="btn btn-sm" onclick="exportStock()">⬇ CSV</button><button class="btn btn-primary btn-sm" onclick="openStockModal()">+ Adicionar produto</button></div></div>
     <div class="tbl-wrap"><table>
-    <tr><th>Produto</th><th>Categoria</th><th>Unid.</th><th class="num">Atual</th><th class="num">Mín.</th><th class="num">Custo médio</th><th class="num">Total</th><th>Fornecedor</th><th></th></tr>
+    <tr><th>Produto</th><th>Categoria</th><th>Unid.</th><th class="num">Estoque atual</th><th class="num">Mínimo</th><th class="num">Custo médio</th><th>Fornecedor</th><th>Status</th><th></th></tr>
     ${list.length?list.map(p=>`<tr>
       <td><b>${esc(p.name)}</b></td><td>${esc(p.cat||'—')}</td><td>${esc(p.unit)}</td>
       <td class="num"><b>${p.qty}</b></td><td class="num">${p.min}</td>
-      <td class="num">${money(p.cost)}</td><td class="num">${money(p.qty*p.cost)}</td>
+      <td class="num">${money(p.cost)}</td>
       <td>${esc(supplierName(p.supplierId))}</td>
+      <td><span class="tag ${p.qty<=p.min?'tag-over':'tag-paid'}">${p.qty<=p.min?'Estoque baixo':'OK'}</span></td>
       <td class="num" style="white-space:nowrap">
         <button class="icon-btn" title="Entrada" onclick="moveStock('${p.id}','in')">＋</button>
         <button class="icon-btn" title="Saída" onclick="moveStock('${p.id}','out')">－</button>
         <button class="icon-btn" title="Perda" onclick="moveStock('${p.id}','loss')">⚠</button>
         <button class="icon-btn" title="Ajuste (definir saldo)" onclick="moveStock('${p.id}','adjust')">✎</button>
         <button class="icon-btn" title="Excluir" onclick="delStock('${p.id}')">🗑</button>
-      </td></tr>`).join(''):'<tr><td colspan=9 class="empty">Nenhum produto cadastrado. Use “+ Produto”.</td></tr>'}
+      </td></tr>`).join(''):'<tr><td colspan=9 class="empty">Nenhum produto cadastrado. Use “+ Adicionar produto”.</td></tr>'}
     </table></div>
-  </div>
-  <div class="card mt">
-    <div class="card-title"><h3>Movimentações recentes</h3></div>
-    <div class="tbl-wrap"><table><tr><th>Data</th><th>Produto</th><th>Tipo</th><th class="num">Qtd</th><th>Nota</th></tr>
-    ${co.data.moves.slice(0,12).map(m=>{const p=co.data.stock.find(x=>x.id===m.stockId);return `<tr><td>${brDate(m.date)}</td><td>${esc(p?p.name:'—')}</td><td>${esc(m.type)}</td><td class="num">${m.qty}</td><td>${esc(m.note||'')}</td></tr>`}).join('')||'<tr><td colspan=5 class="empty">Sem movimentações</td></tr>'}
+  </div>`;
+}
+function viewStockMoves(){
+  const mv=[...co.data.moves].sort((a,b)=>b.date.localeCompare(a.date));
+  const lbl={in:'Entrada',out:'Saída',loss:'Perda',adjust:'Ajuste'};
+  return `
+  <div class="card">
+    <div class="card-title"><h3>Movimentações</h3></div>
+    <div class="tbl-wrap"><table><tr><th>Data</th><th>Produto</th><th>Tipo</th><th class="num">Quantidade</th><th class="num">Custo</th><th>Origem</th><th>Observação</th></tr>
+    ${mv.length?mv.map(m=>{const p=co.data.stock.find(x=>x.id===m.stockId);return `<tr><td>${brDate(m.date)}</td><td>${esc(p?p.name:'—')}</td><td><span class="tag ${m.type==='in'?'tag-paid':m.type==='loss'?'tag-over':'tag-pend'}">${lbl[m.type]||m.type}</span></td><td class="num">${m.qty} ${p?p.unit:''}</td><td class="num">${p?money(p.cost*m.qty):'—'}</td><td>${esc(m.origin||'Manual')}</td><td>${esc(m.note||'')}</td></tr>`}).join(''):'<tr><td colspan=7 class="empty">Sem movimentações</td></tr>'}
     </table></div>
+  </div>`;
+}
+function viewStockLow(){
+  const low=lowStockList().sort((a,b)=>(a.qty-a.min)-(b.qty-b.min));
+  return `
+  <div class="card">
+    <div class="card-title"><h3>Produtos abaixo do mínimo</h3>${low.length?'<span class="tag tag-over">Ação necessária</span>':''}</div>
+    ${low.length?`<div class="tbl-wrap"><table>
+    <tr><th>Produto</th><th class="num">Atual</th><th class="num">Mínimo</th><th class="num">Falta</th><th>Fornecedor</th><th></th></tr>
+    ${low.map(p=>`<tr>
+      <td><b>${esc(p.name)}</b></td>
+      <td class="num neg"><b>${p.qty} ${p.unit}</b></td><td class="num">${p.min} ${p.unit}</td>
+      <td class="num"><b>${Math.max(0,+(p.min-p.qty).toFixed(3))} ${p.unit}</b></td>
+      <td>${esc(supplierName(p.supplierId))}</td>
+      <td class="num"><button class="btn btn-sm btn-primary" onclick="moveStock('${p.id}','in')">Registrar entrada</button></td>
+    </tr>`).join('')}
+    </table></div>`:'<div class="empty">Nenhum produto abaixo do mínimo 🎉</div>'}
   </div>`;
 }
 function moveStock(id,type){
@@ -505,7 +664,7 @@ function moveStock(id,type){
   if(type==='in')p.qty+=n;
   if(type==='out'||type==='loss'){if(n>p.qty){toast('Quantidade maior que o saldo');return}p.qty-=n}
   if(type==='adjust')p.qty=n;
-  co.data.moves.unshift({id:uid(),stockId:p.id,type,date:todayISO(),qty:n,note:label});
+  co.data.moves.unshift({id:uid(),stockId:p.id,type,date:todayISO(),qty:n,note:label,origin:'Manual'});
   save();render();toast(`${label} registrada ✔`);
 }
 function delStock(id){if(confirm('Excluir produto do estoque?')){co.data.stock=co.data.stock.filter(x=>x.id!==id);save();render();toast('Excluído')}}
@@ -550,26 +709,37 @@ function viewPurch(){
   <div class="card mt">
     <div class="card-title"><h3>Histórico de compras</h3><div style="display:flex;gap:8px"><button class="btn btn-sm" onclick="exportPurch()">⬇ CSV</button><button class="btn btn-primary btn-sm" onclick="openPurchModal()">+ Nova compra</button></div></div>
     <div class="tbl-wrap"><table>
-    <tr><th>Data</th><th>Fornecedor</th><th>Itens</th><th class="num">Total</th><th>Status fin.</th><th></th></tr>
+    <tr><th>Data</th><th>Fornecedor</th><th class="num">Itens</th><th class="num">Valor total</th><th>Status</th><th></th></tr>
     ${list.length?list.map(p=>`<tr>
       <td>${brDate(p.date)}</td><td>${esc(supplierName(p.supplierId))}</td>
-      <td>${p.items.map(it=>{const pr=co.data.stock.find(x=>x.id===it.stockId);return esc((pr?pr.name:'—')+' ×'+it.qty)}).join(', ')}</td>
+      <td class="num"><b>${p.items.length}</b> ${p.items.length===1?'item':'itens'}</td>
       <td class="num"><b>${money(p.total)}</b></td>
       <td><span class="tag ${p.finStatus==='pago'?'tag-paid':'tag-pend'}">${p.finStatus}</span></td>
-      <td class="num"><button class="icon-btn" onclick="delPurch('${p.id}')">🗑</button></td>
+      <td class="num"><button class="icon-btn" title="Detalhes" onclick="purchDetail('${p.id}')">👁</button><button class="icon-btn" onclick="delPurch('${p.id}')">🗑</button></td>
     </tr>`).join(''):'<tr><td colspan=6 class="empty">Sem compras. Use “+ Nova compra”.</td></tr>'}
     </table></div>
   </div>`;
 }
 function delPurch(id){if(confirm('Excluir a compra? (estoque e financeiro NÃO são revertidos)')){co.data.purch=co.data.purch.filter(x=>x.id!==id);save();render();toast('Compra excluída')}}
 let purchItems=[];
-function openPurchModal(){
+function purchDetail(id){
+  const p=co.data.purch.find(x=>x.id===id); if(!p)return;
+  modal('Compra — '+supplierName(p.supplierId),`
+    <p class="muted small">Data: ${brDate(p.date)} · Status: ${p.finStatus}${p.note?' · Obs: '+esc(p.note):''}</p>
+    <div class="tbl-wrap mt"><table>
+    <tr><th>Produto</th><th class="num">Qtd</th><th class="num">Preço un.</th><th class="num">Subtotal</th></tr>
+    ${p.items.map(it=>{const pr=co.data.stock.find(x=>x.id===it.stockId);return `<tr><td>${esc(pr?pr.name:'—')}</td><td class="num">${it.qty}</td><td class="num">${money(it.price)}</td><td class="num">${money(it.qty*it.price)}</td></tr>`}).join('')}
+    <tr><td colspan="3" style="text-align:right"><b>Total</b></td><td class="num"><b>${money(p.total)}</b></td></tr>
+    </table></div>
+  `,[]);
+}
+function openPurchModal(supplierId){
   if(!co.data.stock.length){toast('Cadastre produtos no Estoque antes de registrar compra');return}
   if(!co.data.supp.length){toast('Cadastre um fornecedor antes');return}
   purchItems=[{stockId:co.data.stock[0].id,qty:1,price:co.data.stock[0].cost}];
   modal('Nova compra',`
     <div class="row2">
-      <div><label>Fornecedor</label><select id="p_supp">${co.data.supp.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select></div>
+      <div><label>Fornecedor</label><select id="p_supp">${co.data.supp.map(s=>`<option value="${s.id}" ${s.id===supplierId?'selected':''}>${esc(s.name)}</option>`).join('')}</select></div>
       <div><label>Data</label><input id="p_date" type="date" value="${todayISO()}"></div>
     </div>
     <div class="mt"><label>Itens da compra</label><div id="p_items"></div>
@@ -593,7 +763,7 @@ function openPurchModal(){
         pr.qty+=it.qty;
         pr.cost=(oq+it.qty)>0?((oq*oc+it.qty*it.price)/(oq+it.qty)):it.price;
         its.push({stockId:pr.id,qty:it.qty,price:it.price});
-        co.data.moves.unshift({id:uid(),stockId:pr.id,type:'in',date:todayISO(),qty:it.qty,note:'Compra'});
+        co.data.moves.unshift({id:uid(),stockId:pr.id,type:'in',date:todayISO(),qty:it.qty,note:'Compra',origin:'Compra'});
       }
       if(!its.length){toast('Nenhum item válido');return}
       co.data.purch.push({id:uid(),supplierId:$('p_supp').value,date:$('p_date').value||todayISO(),items:its,total,method:$('p_method').value,finStatus:$('p_finStatus').value,note:$('p_note').value.trim()});
@@ -633,22 +803,26 @@ function viewSupp(){
   <div class="card mt">
     <div class="card-title"><h3>Fornecedores</h3><button class="btn btn-primary btn-sm" onclick="openSuppModal()">+ Fornecedor</button></div>
     <div class="tbl-wrap"><table>
-    <tr><th>Nome</th><th>CPF/CNPJ</th><th>Telefone</th><th>WhatsApp</th><th>E-mail</th><th></th></tr>
-    ${list.length?list.map(s=>`<tr>
+    <tr><th>Nome</th><th>CPF/CNPJ</th><th>Telefone</th><th>WhatsApp</th><th>E-mail</th><th class="num">Última compra</th><th class="num">Total comprado</th><th></th></tr>
+    ${list.length?list.map(s=>{const ps=co.data.purch.filter(p=>p.supplierId===s.id);const tot=ps.reduce((x,p)=>x+p.total,0);const last=ps.map(p=>p.date).sort().pop();
+    return `<tr>
       <td><b>${esc(s.name)}</b></td><td>${esc(s.doc||'—')}</td><td>${esc(s.phone||'—')}</td>
       <td>${s.whats?`<a href="https://wa.me/55${esc(s.whats.replace(/\D/g,''))}" target="_blank" style="color:var(--green)">${esc(s.whats)}</a>`:'—'}</td>
       <td>${esc(s.email||'—')}</td>
+      <td class="num">${last?brDate(last):'—'}</td>
+      <td class="num"><b>${money(tot)}</b></td>
       <td class="num" style="white-space:nowrap">
+        <button class="btn btn-sm btn-primary" onclick="openPurchModal('${s.id}')">Nova compra</button>
         <button class="icon-btn" onclick="openSuppModal('${s.id}')">✎</button>
         <button class="icon-btn" onclick="delSupp('${s.id}')">🗑</button>
-      </td></tr>`).join(''):'<tr><td colspan=6 class="empty">Nenhum fornecedor. Use “+ Fornecedor”.</td></tr>'}
+      </td></tr>`}).join(''):'<tr><td colspan=8 class="empty">Nenhum fornecedor. Use “+ Fornecedor”.</td></tr>'}
     </table></div>
   </div>
   <div class="card mt">
-    <div class="card-title"><h3>Compras por fornecedor</h3></div>
-    <div class="tbl-wrap"><table><tr><th>Fornecedor</th><th class="num">Compras</th><th class="num">Total comprado</th><th class="num">Última compra</th></tr>
-    ${list.map(s=>{const ps=co.data.purch.filter(p=>p.supplierId===s.id);const tot=ps.reduce((x,p)=>x+p.total,0);const last=ps.map(p=>p.date).sort().pop();
-    return `<tr><td><b>${esc(s.name)}</b></td><td class="num">${ps.length}</td><td class="num">${money(tot)}</td><td class="num">${last?brDate(last):'—'}</td></tr>`}).join('')||'<tr><td colspan=4 class="empty">Sem fornecedores</td></tr>'}
+    <div class="card-title"><h3>Histórico de compras por fornecedor</h3></div>
+    <div class="tbl-wrap"><table><tr><th>Fornecedor</th><th>Data</th><th>Compra</th><th class="num">Valor</th><th>Produtos comprados</th></tr>
+    ${(()=>{const rows=[];list.forEach(s=>{co.data.purch.filter(p=>p.supplierId===s.id).sort((a,b)=>b.date.localeCompare(a.date)).forEach(p=>{rows.push({s,p})})});
+    return rows.length?rows.map(({s,p})=>`<tr><td><b>${esc(s.name)}</b></td><td>${brDate(p.date)}</td><td class="muted small">${esc(p.id.slice(0,8))}</td><td class="num">${money(p.total)}</td><td>${p.items.map(it=>{const pr=co.data.stock.find(x=>x.id===it.stockId);return esc((pr?pr.name:'—')+' ×'+it.qty)}).join(', ')}</td></tr>`).join(''):'<tr><td colspan=5 class="empty">Sem compras registradas</td></tr>'})()}
     </table></div>
   </div>`;
 }
@@ -682,11 +856,13 @@ function delSupp(id){if(confirm('Excluir fornecedor?')){co.data.supp=co.data.sup
 /* ---------- PRODUTOS & PRATOS ---------- */
 function dishCost(d){return (d.ingredients||[]).reduce((s,i)=>{const p=co.data.stock.find(x=>x.id===i.stockId);return s+(p?p.cost*i.qty:0)},0)}
 function dishMargin(d){const c=dishCost(d);return d.price>0?Math.round((d.price-c)/d.price*100):0}
+function pct(n){return n.toLocaleString('pt-BR',{maximumFractionDigits:1})+'%'}
 function viewProds(){
   const list=[...co.data.prods].sort((a,b)=>a.name.localeCompare(b.name));
   const dishes=list.filter(p=>p.kind==='dish');
   const prods=list.filter(p=>p.kind==='product');
   const avgM=dishes.length?Math.round(dishes.reduce((s,d)=>s+dishMargin(d),0)/dishes.length):null;
+  const tab=subMod.pratos?'pratos':subMod.ficha?'ficha':'produtos';
   return `
   <div class="grid g4">
     ${kpi('Produtos (venda)',prods.length,'')}
@@ -694,30 +870,78 @@ function viewProds(){
     ${kpi('Margem média',avgM===null?'—':avgM+'%','dos pratos',avgM!==null?(avgM>=40?'pos':avgM>0?'warn':'neg'):'')}
     ${kpi('Custo médio prato',dishes.length?money(dishes.reduce((s,d)=>s+dishCost(d),0)/dishes.length):'—','')}
   </div>
-  <div class="card mt">
-    <div class="card-title"><h3>Produtos e pratos</h3><button class="btn btn-primary btn-sm" onclick="openProdModal()">+ Produto/Prato</button></div>
+  <div class="tabs mt">
+    <button class="tab ${tab==='produtos'?'active':''}" onclick="go('prods','produtos')">Produtos</button>
+    <button class="tab ${tab==='pratos'?'active':''}" onclick="go('prods','pratos')">Pratos</button>
+    <button class="tab ${tab==='ficha'?'active':''}" onclick="go('prods','ficha')">Ficha técnica</button>
+  </div>
+  ${tab==='produtos'?prodsTab(prods):tab==='pratos'?dishesTab(dishes):fichaTab(dishes)}`;
+}
+function prodsTab(prods){
+  return `
+  <div class="card">
+    <div class="card-title"><h3>Produtos de venda</h3><button class="btn btn-primary btn-sm" onclick="openProdModal()">+ Adicionar produto</button></div>
     <div class="tbl-wrap"><table>
-    <tr><th>Item</th><th>Tipo</th><th class="num">Custo estimado</th><th class="num">Preço de venda</th><th class="num">Margem</th><th></th></tr>
-    ${list.length?list.map(p=>{
-      const cost=p.kind==='dish'?dishCost(p):(p.costPrice||0);
-      const price=p.price||0;
+    <tr><th>Nome</th><th>Categoria</th><th class="num">Custo</th><th class="num">Preço de venda</th><th class="num">Margem</th><th></th></tr>
+    ${prods.length?prods.map(p=>{
+      const cost=p.costPrice||0, price=p.price||0;
       const mg=price>0?Math.round((price-cost)/price*100):0;
       return `<tr>
-        <td><b>${esc(p.name)}</b></td>
-        <td><span class="tag ${p.kind==='dish'?'tag-info':'tag-paid'}">${p.kind==='dish'?'Prato':'Produto'}</span> <span class="muted small">${esc(p.cat||'')}</span></td>
+        <td><b>${esc(p.name)}</b></td><td>${esc(p.cat||'—')}</td>
         <td class="num">${money(cost)}</td><td class="num">${money(price)}</td>
         <td class="num ${mg>=40?'pos':mg>0?'warn':'neg'}"><b>${price>0?mg+'%':'—'}</b></td>
         <td class="num" style="white-space:nowrap">
           <button class="icon-btn" onclick="openProdModal('${p.id}')">✎</button>
           <button class="icon-btn" onclick="delProd('${p.id}')">🗑</button>
-        </td></tr>`}).join(''):'<tr><td colspan=6 class="empty">Cadastre produtos de venda e pratos com receita.</td></tr>'}
+        </td></tr>`}).join(''):'<tr><td colspan=6 class="empty">Nenhum produto. Use “+ Adicionar produto”.</td></tr>'}
     </table></div>
   </div>`;
 }
+function dishesTab(dishes){
+  return `
+  <div class="card">
+    <div class="card-title"><h3>Pratos</h3><button class="btn btn-primary btn-sm" onclick="openProdModal('new','dish')">+ Adicionar prato</button></div>
+    <div class="tbl-wrap"><table>
+    <tr><th>Nome</th><th class="num">Preço de venda</th><th class="num">Custo</th><th class="num">Margem</th><th class="num">Ingredientes</th><th></th></tr>
+    ${dishes.length?dishes.map(p=>{
+      const cost=dishCost(p), mg=dishMargin(p);
+      return `<tr>
+        <td><b>${esc(p.name)}</b></td>
+        <td class="num">${money(p.price)}</td><td class="num">${money(cost)}</td>
+        <td class="num ${mg>=40?'pos':mg>0?'warn':'neg'}"><b>${p.price>0?mg+'%':'—'}</b></td>
+        <td class="num">${(p.ingredients||[]).length}</td>
+        <td class="num" style="white-space:nowrap">
+          <button class="icon-btn" onclick="openProdModal('${p.id}')">✎</button>
+          <button class="icon-btn" onclick="delProd('${p.id}')">🗑</button>
+        </td></tr>`}).join(''):'<tr><td colspan=6 class="empty">Nenhum prato. Use “+ Adicionar prato”.</td></tr>'}
+    </table></div>
+  </div>`;
+}
+function fichaTab(dishes){
+  if(!dishes.length)return '<div class="card"><div class="empty">Cadastre um prato com ingredientes para ver a ficha técnica.</div></div>';
+  return dishes.map(d=>{
+    const cost=dishCost(d);
+    const mb=d.price-cost;
+    const mg=dishMargin(d);
+    return `
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-title"><h3>📋 ${esc(d.name)}</h3><span class="tag ${mg>=40?'tag-paid':mg>0?'tag-pend':'tag-over'}">Margem ${pct(mg)}</span></div>
+    <div class="tbl-wrap"><table>
+    <tr><th>Ingrediente</th><th class="num">Quantidade</th><th class="num">Custo</th></tr>
+    ${(d.ingredients||[]).map(i=>{const p=co.data.stock.find(x=>x.id===i.stockId);return `<tr><td>${esc(p?p.name:'—')}</td><td class="num">${i.qty} ${p?p.unit:''}</td><td class="num">${money(p?p.cost*i.qty:0)}</td></tr>`}).join('')}
+    </table></div>
+    <div class="ficha-total">
+      <div class="row"><span>Custo total dos ingredientes</span><b>${money(cost)}</b></div>
+      <div class="row"><span>Preço de venda</span><b>${money(d.price)}</b></div>
+      <div class="row"><span>Margem bruta</span><b class="pos">${money(mb)}</b></div>
+      <div class="row"><span>Margem (%)</span><b class="${mg>=40?'pos':mg>0?'warn':'neg'}">${pct(mg)}</b></div>
+    </div>
+  </div>`}).join('');
+}
 let ings=[];
-function openProdModal(id){
-  const p=id?co.data.prods.find(x=>x.id===id):null;
-  const isDish=p?p.kind==='dish':false;
+function openProdModal(id,forceKind){
+  const p=id&&id!=='new'?co.data.prods.find(x=>x.id===id):null;
+  const isDish=p?p.kind==='dish':(forceKind==='dish');
   ings=p&&p.ingredients?JSON.parse(JSON.stringify(p.ingredients)):[];
   modal(p?'Editar produto/prato':'Novo produto/prato',`
     <div class="row2">
@@ -792,6 +1016,81 @@ function updateDishCost(){
 }
 function addIng(){if(!co.data.stock.length){toast('Cadastre ingredientes no Estoque primeiro');return}ings.push({stockId:co.data.stock[0].id,qty:0.15});renderIngs()}
 function delProd(id){if(confirm('Excluir item?')){co.data.prods=co.data.prods.filter(x=>x.id!==id);save();render();toast('Excluído')}}
+
+/* ---------- RELATÓRIOS ---------- */
+function viewReports(){
+  const cards=[
+    {id:'fin',icon:'💰',t:'Resumo financeiro',d:'Receitas, despesas e resultado por período'},
+    {id:'purch',icon:'🛒',t:'Compras por período',d:'Compras e valores por intervalo de datas'},
+    {id:'stock',icon:'📦',t:'Estoque',d:'Situação atual de todos os produtos'},
+    {id:'low',icon:'⚠️',t:'Produtos com estoque baixo',d:'O que precisa repor agora'},
+    {id:'margin',icon:'🍽️',t:'Produtos e pratos com maior margem',d:'Ranking de rentabilidade'}
+  ];
+  return `
+  <div class="grid g4">
+    ${cards.map(c=>`<div class="card rep-card" onclick="openReport('${c.id}')">
+      <div style="font-size:24px">${c.icon}</div>
+      <div style="font-weight:700;margin:6px 0 4px">${c.t}</div>
+      <div class="small muted">${c.d}</div>
+    </div>`).join('')}
+  </div>
+  <div id="repArea" class="mt"></div>`;
+}
+function openReport(id){
+  const area=$('repArea');
+  if(id==='fin'){
+    const fin=co.data.fin;
+    const inT=fin.filter(f=>f.type==='in').reduce((s,f)=>s+f.value,0);
+    const outT=fin.filter(f=>f.type==='out').reduce((s,f)=>s+f.value,0);
+    const cats={};
+    fin.forEach(f=>{const c=f.cat||'Sem categoria';cats[c]=cats[c]||{in:0,out:0};cats[c][f.type==='in'?'in':'out']+=f.value});
+    area.innerHTML=`
+    <div class="card">
+      <div class="card-title"><h3>💰 Resumo financeiro</h3><button class="btn btn-sm" onclick="exportFin()">⬇ CSV</button></div>
+      <div class="grid g4 mb">
+        ${kpi('Receitas',money(inT),'','pos')}
+        ${kpi('Despesas',money(outT),'','neg')}
+        ${kpi('Resultado',money(inT-outT),'',inT-outT>=0?'pos':'neg')}
+        ${kpi('Margem',inT>0?((inT-outT)/inT*100).toFixed(1).replace('.',',')+'%':'—','')}
+      </div>
+      <div class="tbl-wrap"><table><tr><th>Categoria</th><th class="num">Receitas</th><th class="num">Despesas</th></tr>
+      ${Object.entries(cats).map(([c,v])=>`<tr><td>${esc(c)}</td><td class="num">${v.in?money(v.in):'—'}</td><td class="num">${v.out?money(v.out):'—'}</td></tr>`).join('')||'<tr><td colspan=3 class="empty">Sem lançamentos</td></tr>'}
+      </table></div>
+    </div>`;
+  }
+  if(id==='purch'){
+    const list=[...co.data.purch].sort((a,b)=>b.date.localeCompare(a.date));
+    area.innerHTML=`
+    <div class="card">
+      <div class="card-title"><h3>🛒 Compras por período</h3><button class="btn btn-sm" onclick="exportPurch()">⬇ CSV</button></div>
+      <div class="tbl-wrap"><table><tr><th>Mês</th><th class="num">Compras</th><th class="num">Total</th></tr>
+      ${(()=>{const by={};list.forEach(p=>{const k=p.date.slice(0,7);by[k]=by[k]||{n:0,t:0};by[k].n++;by[k].t+=p.total});
+      return Object.entries(by).sort((a,b)=>b[0].localeCompare(a[0])).map(([k,v])=>`<tr><td>${k.split('-').reverse().join('/')}</td><td class="num">${v.n}</td><td class="num">${money(v.t)}</td></tr>`).join('')||'<tr><td colspan=3 class="empty">Sem compras</td></tr>'})()}
+      </table></div>
+    </div>`;
+  }
+  if(id==='stock')exportStock(),area.innerHTML=`<div class="card"><div class="empty">CSV do estoque baixado. Abra em qualquer planilha.</div></div>`;
+  if(id==='low')area.innerHTML=`
+    <div class="card">
+      <div class="card-title"><h3>⚠️ Produtos com estoque baixo</h3></div>
+      ${viewStockLow()}
+    </div>`;
+  if(id==='margin'){
+    const items=[...co.data.prods].map(p=>{
+      const cost=p.kind==='dish'?dishCost(p):(p.costPrice||0);
+      const price=p.price||0;
+      return {name:p.name,kind:p.kind==='dish'?'Prato':'Produto',cost,price,mg:price>0?((price-cost)/price*100):null};
+    }).filter(x=>x.mg!==null).sort((a,b)=>b.mg-a.mg);
+    area.innerHTML=`
+    <div class="card">
+      <div class="card-title"><h3>🍽️ Ranking de margem</h3></div>
+      <div class="tbl-wrap"><table><tr><th>#</th><th>Item</th><th>Tipo</th><th class="num">Custo</th><th class="num">Preço</th><th class="num">Margem</th></tr>
+      ${items.length?items.map((x,i)=>`<tr><td>${i+1}º</td><td><b>${esc(x.name)}</b></td><td>${x.kind}</td><td class="num">${money(x.cost)}</td><td class="num">${money(x.price)}</td><td class="num ${x.mg>=40?'pos':x.mg>0?'warn':'neg'}"><b>${pct(Math.round(x.mg))}</b></td></tr>`).join(''):'<tr><td colspan=6 class="empty">Cadastre preços para ver o ranking</td></tr>'}
+      </table></div>
+    </div>`;
+  }
+  area.scrollIntoView({behavior:'smooth'});
+}
 
 /* ---------- CONFIGURAÇÕES ---------- */
 function viewSettings(){
